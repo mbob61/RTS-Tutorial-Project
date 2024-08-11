@@ -57,6 +57,12 @@ public class Building
 
         //Remove the "is_trigger" from the collider so the buildings can have collisions
         transform.GetComponent<BoxCollider>().isTrigger = false;
+
+        // Update the players resources by deducting the cost of the building
+        foreach (KeyValuePair<string, int> pair in buildingData.Cost)
+        {
+            Globals.AVAILABLE_RESOURCES[pair.Key].UpdateAmount(-pair.Value);
+        }
     }
 
     public void CheckAndSetPlacementStatus()
@@ -95,6 +101,11 @@ public class Building
             return;
         }
         transform.Find("Mesh").GetComponent<Renderer>().materials = materials.ToArray();
+    }
+
+    public bool CanBuy()
+    {
+        return buildingData.IsAffordable();
     }
 
     public bool HasFixedPlacementStatus { get => placementStatus == BuildingPlacementStatus.FIXED; }

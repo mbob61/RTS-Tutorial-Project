@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 
 public class BuildingPlacer : MonoBehaviour
 {
+    private UIManager uiManager;
     private Building buildingToPlace = null;
 
     private Ray ray;
@@ -12,9 +13,9 @@ public class BuildingPlacer : MonoBehaviour
     private Vector3 lastPlacementPosition;
     [SerializeField] private LayerMask terrainLayer;
 
-    public void SelectBuildingToPlace(int buildingDataIndex)
+    private void Awake()
     {
-        PrepareBuildingWithIndexForPlacement(buildingDataIndex);
+        uiManager = GetComponent<UIManager>();
     }
 
     private void Update()
@@ -46,6 +47,11 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
+    public void SelectBuildingToPlace(int buildingDataIndex)
+    {
+        PrepareBuildingWithIndexForPlacement(buildingDataIndex);
+    }
+
     private void PrepareBuildingWithIndexForPlacement(int index)
     {
         //Destroy the previous "phantom" if there is one
@@ -68,9 +74,26 @@ public class BuildingPlacer : MonoBehaviour
 
     private void PlaceBuilding()
     {
+        // Place the building
         buildingToPlace.Place();
-        //keep on building the same type of building
-        PrepareBuildingWithIndexForPlacement(buildingToPlace.DataIndex);
-    }
 
+        // Do not allow subsquent builds without pressing the button again
+        // If this is desired, comment out the below and uncomment the below block
+        _CancelPlacedBuilding();
+
+        //// Allow continous building if we have the resources for it
+        //if (buildingToPlace.CanBuy())
+        //{
+        //    PrepareBuildingWithIndexForPlacement(buildingToPlace.DataIndex);
+        //}
+        //else
+        //{
+        //    buildingToPlace = null;
+        //}
+
+        // Update the resources texts to reflect the purchase
+        uiManager.UpdateResourcesTexts();
+        // Set the button interactivity based on the update resources
+        uiManager.SetBuildingButtonInteractivity();
+    }
 }

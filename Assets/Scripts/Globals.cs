@@ -13,8 +13,8 @@ public class Globals {
         new BuildingData("Tower", 50, new Dictionary<string, int>()
         {
             { "gold", 80 },
-            { "wood", 80 },
-            { "stone", 100 }
+            //{ "wood", 80 },
+            //{ "stone", 100 }
         })
     };
     public static Dictionary<string, GameResource> AVAILABLE_RESOURCES = new Dictionary<string, GameResource>()

@@ -52,6 +52,18 @@ public class UIManager : MonoBehaviour
         } 
     }
 
+    private void OnEnable()
+    {
+        EventManager.AddListener("UpdateResourceText", UpdateResourcesTexts);
+        EventManager.AddListener("SetBuildingButtonInteractivity", SetBuildingButtonInteractivity);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.RemoveListener("UpdateResourceText", UpdateResourcesTexts);
+        EventManager.RemoveListener("SetBuildingButtonInteractivity", SetBuildingButtonInteractivity);
+    }
+
     private void AddBuildingButtonListener(Button button, int globalBuildingIndex)
     {
         button.onClick.AddListener(() => buildingPlacer.SelectBuildingToPlace(globalBuildingIndex));

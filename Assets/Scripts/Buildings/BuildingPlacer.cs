@@ -79,21 +79,21 @@ public class BuildingPlacer : MonoBehaviour
 
         // Do not allow subsquent builds without pressing the button again
         // If this is desired, comment out the below and uncomment the below block
-        _CancelPlacedBuilding();
+        buildingToPlace = null;
 
-        //// Allow continous building if we have the resources for it
+        // Allow continous building if we have the resources for it
         //if (buildingToPlace.CanBuy())
         //{
         //    PrepareBuildingWithIndexForPlacement(buildingToPlace.DataIndex);
         //}
         //else
         //{
-        //    buildingToPlace = null;
+        //buildingToPlace = null;
         //}
 
         // Update the resources texts to reflect the purchase
-        uiManager.UpdateResourcesTexts();
+        EventManager.TriggerEvent("UpdateResourceText");
         // Set the button interactivity based on the update resources
-        uiManager.SetBuildingButtonInteractivity();
+        EventManager.TriggerEvent("SetBuildingButtonInteractivity");
     }
 }

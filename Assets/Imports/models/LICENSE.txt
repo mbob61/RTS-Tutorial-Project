@@ -1,0 +1,5 @@
+Copyright © 2022 Mina Pêcheux
+
+Set of 18 3D models provided with the ebook: "Let's make a RTS game in Unity/C#!". All rights reserved.
+No part of the ebook or the related files may be reproduced or transmitted in any form, by any means
+(electronic, photocopying, recording, or otherwise) without the prior written permission of the author.

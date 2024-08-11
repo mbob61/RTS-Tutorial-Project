@@ -5,6 +5,7 @@ using UnityEngine;
 public class Globals {
     public static BuildingData[] AVAILABLE_BUILDINGS_DATA = new BuildingData[]
     {
-        new BuildingData("Building", 100)
+        new BuildingData("House", 100),
+        new BuildingData("Tower", 50)
     };
 }

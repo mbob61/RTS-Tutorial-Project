@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class BuildingPlacer : MonoBehaviour
 {
@@ -11,11 +12,9 @@ public class BuildingPlacer : MonoBehaviour
     private Vector3 lastPlacementPosition;
     [SerializeField] private LayerMask terrainLayer;
 
-    void Start()
+    public void SelectBuildingToPlace(int buildingDataIndex)
     {
-        // for now, we'll automatically pick our first
-        // building type as the type we want to build
-        PrepareBuildingWithIndexForPlacement(0);
+        PrepareBuildingWithIndexForPlacement(buildingDataIndex);
     }
 
     private void Update()
@@ -39,7 +38,7 @@ public class BuildingPlacer : MonoBehaviour
                 lastPlacementPosition = raycastHit.point;
             }
 
-            if (buildingToPlace.HasValidPlacementStatus && Input.GetMouseButtonDown(0))
+            if (buildingToPlace.HasValidPlacementStatus && Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {
                 // Place Building
                 PlaceBuilding();

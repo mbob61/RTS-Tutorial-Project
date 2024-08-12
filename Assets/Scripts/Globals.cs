@@ -12,7 +12,7 @@ public class Globals {
         }),
         new BuildingData("Tower", 50, new Dictionary<string, int>()
         {
-            { "gold", 80 },
+            { "gold", 10 },
             //{ "wood", 80 },
             //{ "stone", 100 }
         })
@@ -23,4 +23,5 @@ public class Globals {
         {"wood", new GameResource("Wood", 210) },
         {"stone", new GameResource("Stone", 110) }
     };
+    public static List<UnitManager> CURRENTLY_SELECTED_UNITS = new List<UnitManager>();
 }

@@ -1534,6 +1534,7 @@ GameObject:
   - component: {fileID: 2124038017}
   - component: {fileID: 2124038016}
   - component: {fileID: 2124038018}
+  - component: {fileID: 2124038019}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1587,6 +1588,18 @@ MonoBehaviour:
   buildingButtonPrefab: {fileID: 4827554756361329939, guid: ba949c6bf3aa94ed0b0f3b3f10fa6b55, type: 3}
   resourceUIParent: {fileID: 1428274954}
   resourceDisplayPrefab: {fileID: 8065788569096675292, guid: cdb273b13dae3451b809b97b9e5b1c06, type: 3}
+--- !u!114 &2124038019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2124038015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 348952843f46243afa533db5447d6f4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6377133804105648208
 PrefabInstance:
   m_ObjectHideFlags: 0

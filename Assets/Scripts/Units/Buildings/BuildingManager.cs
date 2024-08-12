@@ -2,8 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(BoxCollider))]
-public class BuildingManager : MonoBehaviour
+public class BuildingManager : UnitManager
 {
     [SerializeField] private LayerMask terrainLayer;
     private BoxCollider boxCollider;
@@ -78,6 +77,11 @@ public class BuildingManager : MonoBehaviour
             }
         }
         return invalidCornersCount < 3;
+    }
+
+    protected override bool IsReadyForSelection()
+    {
+        return building.HasFixedPlacementStatus;
     }
 
 }

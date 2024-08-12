@@ -5,18 +5,12 @@ using UnityEngine.EventSystems;
 
 public class BuildingPlacer : MonoBehaviour
 {
-    private UIManager uiManager;
     private Building buildingToPlace = null;
 
     private Ray ray;
     private RaycastHit raycastHit;
     private Vector3 lastPlacementPosition;
     [SerializeField] private LayerMask terrainLayer;
-
-    private void Awake()
-    {
-        uiManager = GetComponent<UIManager>();
-    }
 
     private void Update()
     {
@@ -39,7 +33,7 @@ public class BuildingPlacer : MonoBehaviour
                 lastPlacementPosition = raycastHit.point;
             }
 
-            if (buildingToPlace.HasValidPlacementStatus && Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
+            if (buildingToPlace.HasValidPlacementStatus && Input.GetMouseButtonUp(0) && !EventSystem.current.IsPointerOverGameObject())
             {
                 // Place Building
                 PlaceBuilding();
@@ -79,17 +73,17 @@ public class BuildingPlacer : MonoBehaviour
 
         // Do not allow subsquent builds without pressing the button again
         // If this is desired, comment out the below and uncomment the below block
-        buildingToPlace = null;
-
-        // Allow continous building if we have the resources for it
-        //if (buildingToPlace.CanBuy())
-        //{
-        //    PrepareBuildingWithIndexForPlacement(buildingToPlace.DataIndex);
-        //}
-        //else
-        //{
         //buildingToPlace = null;
-        //}
+
+        //Allow continous building if we have the resources for it
+        if (buildingToPlace.CanBuy())
+            {
+                PrepareBuildingWithIndexForPlacement(buildingToPlace.DataIndex);
+            }
+            else
+            {
+                buildingToPlace = null;
+            }
 
         // Update the resources texts to reflect the purchase
         EventManager.TriggerEvent("UpdateResourceText");

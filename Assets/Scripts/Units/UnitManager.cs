@@ -6,6 +6,13 @@ using UnityEngine;
 public class UnitManager : MonoBehaviour
 {
     [SerializeField] private GameObject selectionIndicator;
+    private Transform canvasTransform;
+    private GameObject healthBar;
+
+    private void Awake()
+    {
+        canvasTransform = GameObject.Find("Canvas").transform;
+    }
 
     private void OnMouseDown()
     {
@@ -56,6 +63,19 @@ public class UnitManager : MonoBehaviour
     {
         Globals.CURRENTLY_SELECTED_UNITS.Add(this);
         selectionIndicator.SetActive(true);
+
+        if (healthBar == null)
+        {
+            healthBar = GameObject.Instantiate(Resources.Load("Prefabs/UI/Healthbar")) as GameObject;
+            healthBar.transform.SetParent(canvasTransform);
+            Healthbar h = healthBar.GetComponent<Healthbar>();
+            Rect boundingBox = Utils.GetBoundingBoxOnScreen(
+                transform.Find("Mesh").GetComponent<Renderer>().bounds,
+                Camera.main
+            );
+            h.InitializeHealthBar(transform, boundingBox.height);
+            h.SetPosition();
+        }
     }
 
     public void DeselectUnit()
@@ -65,6 +85,9 @@ public class UnitManager : MonoBehaviour
 
         Globals.CURRENTLY_SELECTED_UNITS.Remove(this);
         selectionIndicator.SetActive(false);
+
+        Destroy(healthBar);
+        healthBar = null;
     }
 
     protected virtual bool IsReadyForSelection()

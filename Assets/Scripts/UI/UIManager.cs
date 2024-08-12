@@ -7,19 +7,36 @@ using TMPro;
 public class UIManager : MonoBehaviour
 {
     private BuildingPlacer buildingPlacer;
+    [SerializeField] private Color invalidColor;
+
     [SerializeField] private Transform buildingMenuParent;
     [SerializeField] private GameObject buildingButtonPrefab;
 
     [SerializeField] private Transform resourceUIParent;
     [SerializeField] private GameObject resourceDisplayPrefab;
 
+    [SerializeField] private GameObject infoPanelParent;
+    [SerializeField] private GameObject infoPanelResourceDisplayPrefab;
+
     private Dictionary<string, TextMeshProUGUI> resourceTextFields;
     private Dictionary<string, Button> buildingButtons;
+
+    private TextMeshProUGUI infoPanelTitleText;
+    private TextMeshProUGUI infoPanelDescriptionText;
+    private Transform infoPanelResourcesParent;
 
     private void Awake()
     {
         buildingPlacer = GetComponent<BuildingPlacer>();
 
+        // Info Panel 
+        Transform infoPanelTransform = infoPanelParent.transform;
+        infoPanelTitleText = infoPanelTransform.Find("Content/Title").GetComponent<TextMeshProUGUI>();
+        infoPanelDescriptionText = infoPanelTransform.Find("Content/Description").GetComponent<TextMeshProUGUI>();
+        infoPanelResourcesParent = infoPanelTransform.Find("Content/Resources");
+
+        ShowInfoPanel(false);
+        
         // Building Purchase Buttons
         buildingButtons = new Dictionary<string, Button>();
         for (int i = 0; i < Globals.AVAILABLE_BUILDINGS_DATA.Length; i++)
@@ -39,7 +56,11 @@ public class UIManager : MonoBehaviour
                 Debug.Log("Unaffordable");
                 buttonObject.interactable = false;
             }
+            button.GetComponent<BuildingButton>().Initialize(Globals.AVAILABLE_BUILDINGS_DATA[i]);
         }
+
+
+        // Add the hover listeners for the buttons
 
         // Resource information top bar
         resourceTextFields = new Dictionary<string, TextMeshProUGUI>();
@@ -56,12 +77,16 @@ public class UIManager : MonoBehaviour
     {
         EventManager.AddListener("UpdateResourceText", UpdateResourcesTexts);
         EventManager.AddListener("SetBuildingButtonInteractivity", SetBuildingButtonInteractivity);
+        EventManager.AddCustomListener("HoverBuildingButton", OnHoverBuildingButton);
+        EventManager.AddListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
     }
 
     private void OnDisable()
     {
         EventManager.RemoveListener("UpdateResourceText", UpdateResourcesTexts);
         EventManager.RemoveListener("SetBuildingButtonInteractivity", SetBuildingButtonInteractivity);
+        EventManager.RemoveCustomListener("HoverBuildingButton", OnHoverBuildingButton);
+        EventManager.RemoveListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
     }
 
     private void AddBuildingButtonListener(Button button, int globalBuildingIndex)
@@ -88,5 +113,56 @@ public class UIManager : MonoBehaviour
         {
             buildingButtons[data.code].interactable = data.IsAffordable();
         }
+    }
+
+    private void OnHoverBuildingButton(CustomEventData data)
+    {
+        SetInfoPanel(data.buildingData);
+        ShowInfoPanel(true);
+    }
+
+    private void OnUnhoverBuildingButton()
+    {
+        ShowInfoPanel(false);
+    }
+
+    public void SetInfoPanel(BuildingData data)
+    {
+        // update texts
+        if (data.code != "")
+        {
+            infoPanelTitleText.text = data.code;
+        }
+        if (data.description != "")
+        {
+            infoPanelDescriptionText.text = data.description;
+        }
+
+        // clear resource costs and reinstantiate new ones
+        foreach (Transform child in infoPanelResourcesParent)
+            Destroy(child.gameObject);
+
+        if (data.costs.Count > 0)
+        {
+            GameObject g; Transform t;
+            foreach (ResourceValue resource in data.costs)
+            {
+                g = GameObject.Instantiate(infoPanelResourceDisplayPrefab, infoPanelResourcesParent);
+                t = g.transform;
+                t.Find("Amount").GetComponent<TextMeshProUGUI>().text = resource.code + ": " + resource.amount.ToString();
+                t.Find("Icon").GetComponent<Image>().sprite = Resources.Load<Sprite>(
+                    $"Textures/GameResources/{resource.code}");
+
+                if (Globals.AVAILABLE_RESOURCES[resource.code].CurrentAmount < resource.amount)
+                {
+                    t.Find("Amount").GetComponent<TextMeshProUGUI>().color = invalidColor;
+                }
+            }
+        }
+    }
+
+    public void ShowInfoPanel(bool show)
+    {
+        infoPanelParent.SetActive(show);
     }
 }

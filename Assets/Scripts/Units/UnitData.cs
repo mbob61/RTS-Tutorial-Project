@@ -5,7 +5,7 @@ using UnityEngine;
 public class UnitData : ScriptableObject
 {
     public string code;
-    public string buildingName;
+    public string unitName;
     public string description;
     public int healthpoints;
     public GameObject unitPrefab;

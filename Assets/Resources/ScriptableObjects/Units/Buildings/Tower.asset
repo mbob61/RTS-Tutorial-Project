@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 122c052b8365d4912a42c95d9b95f01c, type: 3}
+  m_Script: {fileID: 11500000, guid: 75c6bc63c20a544b9948f5169094d7ed, type: 3}
   m_Name: Tower
   m_EditorClassIdentifier: 
   code: tower
-  buildingName: Tower
-  description: A tower to see things far away.
+  unitName: Tower
+  description: A nice tall tower.
   healthpoints: 50
-  buildingPrefab: {fileID: 2502313377195916727, guid: 59b47fc9938ae42eb96511e200850eba, type: 3}
+  unitPrefab: {fileID: 2502313377195916727, guid: 59b47fc9938ae42eb96511e200850eba, type: 3}
   costs:
   - code: gold
-    amount: 1
+    amount: 10

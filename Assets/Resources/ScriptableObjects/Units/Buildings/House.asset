@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 122c052b8365d4912a42c95d9b95f01c, type: 3}
+  m_Script: {fileID: 11500000, guid: 75c6bc63c20a544b9948f5169094d7ed, type: 3}
   m_Name: House
   m_EditorClassIdentifier: 
   code: house
-  buildingName: House
+  unitName: House
   description: A house for people to live in.
   healthpoints: 100
-  buildingPrefab: {fileID: 2502313377195916727, guid: 7c09d2190213247849ec88b432b4668a, type: 3}
+  unitPrefab: {fileID: 2502313377195916727, guid: 7c09d2190213247849ec88b432b4668a, type: 3}
   costs:
   - code: gold
     amount: 100

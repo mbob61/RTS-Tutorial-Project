@@ -35,7 +35,10 @@ public class UnitManager : MonoBehaviour
         // If this is a drag select, select the unit
         if (!singleClick)
         {
-            Select();
+            if (!Globals.CURRENTLY_SELECTED_UNITS.Contains(this))
+            {
+                Select();
+            }
         }
         else
         {
@@ -69,6 +72,8 @@ public class UnitManager : MonoBehaviour
 
     private void Select()
     {
+        EventManager.TriggerCustomEvent("SelectUnit", new CustomEventData(Unit));
+
         Globals.CURRENTLY_SELECTED_UNITS.Add(this);
         selectionIndicator.SetActive(true);
 
@@ -96,6 +101,8 @@ public class UnitManager : MonoBehaviour
 
         Destroy(healthBar);
         healthBar = null;
+        EventManager.TriggerCustomEvent("DeselectUnit", new CustomEventData(Unit));
+
     }
 
     protected virtual bool IsReadyForSelection()

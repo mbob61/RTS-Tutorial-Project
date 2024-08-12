@@ -12,11 +12,14 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Transform buildingMenuParent;
     [SerializeField] private GameObject buildingButtonPrefab;
 
-    [SerializeField] private Transform resourceUIParent;
+    [SerializeField] private Transform resourceParent;
     [SerializeField] private GameObject resourceDisplayPrefab;
 
     [SerializeField] private GameObject infoPanelParent;
     [SerializeField] private GameObject infoPanelResourceDisplayPrefab;
+
+    [SerializeField] private Transform selectedUnitsParent;
+    [SerializeField] private GameObject selectedUnitDisplayPrefab;
 
     private Dictionary<string, TextMeshProUGUI> resourceTextFields;
     private Dictionary<string, Button> buildingButtons;
@@ -45,7 +48,7 @@ public class UIManager : MonoBehaviour
 
             string code = Globals.AVAILABLE_BUILDINGS_DATA[i].code;
             button.name = code;
-            button.transform.Find("Title").GetComponent<TextMeshProUGUI>().text = Globals.AVAILABLE_BUILDINGS_DATA[i].buildingName;
+            button.transform.Find("Title").GetComponent<TextMeshProUGUI>().text = Globals.AVAILABLE_BUILDINGS_DATA[i].unitName;
 
             Button buttonObject = button.GetComponent<Button>();
             AddBuildingButtonListener(buttonObject, i);
@@ -59,14 +62,11 @@ public class UIManager : MonoBehaviour
             button.GetComponent<BuildingButton>().Initialize(Globals.AVAILABLE_BUILDINGS_DATA[i]);
         }
 
-
-        // Add the hover listeners for the buttons
-
         // Resource information top bar
         resourceTextFields = new Dictionary<string, TextMeshProUGUI>();
         foreach (KeyValuePair<string, GameResource> pair in Globals.AVAILABLE_RESOURCES)
         {
-            GameObject resourceDisplayObject = Instantiate(resourceDisplayPrefab, resourceUIParent);
+            GameObject resourceDisplayObject = Instantiate(resourceDisplayPrefab, resourceParent);
             resourceDisplayPrefab.name = pair.Key;
             resourceTextFields[pair.Key] = resourceDisplayObject.transform.Find("Amount").GetComponent<TextMeshProUGUI>();
             SetResourcesText(pair.Key, pair.Value);
@@ -75,18 +75,23 @@ public class UIManager : MonoBehaviour
 
     private void OnEnable()
     {
-        EventManager.AddListener("UpdateResourceText", UpdateResourcesTexts);
-        EventManager.AddListener("SetBuildingButtonInteractivity", SetBuildingButtonInteractivity);
+        EventManager.AddListener("UpdateResourceText", OnUpdateResourcesTexts);
+        EventManager.AddListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
         EventManager.AddCustomListener("HoverBuildingButton", OnHoverBuildingButton);
         EventManager.AddListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
+        EventManager.AddCustomListener("SelectUnit", _OnSelectUnit);
+        EventManager.AddCustomListener("DeselectUnit", _OnDeselectUnit);
     }
 
     private void OnDisable()
     {
-        EventManager.RemoveListener("UpdateResourceText", UpdateResourcesTexts);
-        EventManager.RemoveListener("SetBuildingButtonInteractivity", SetBuildingButtonInteractivity);
+        EventManager.RemoveListener("UpdateResourceText", OnUpdateResourcesTexts);
+        EventManager.RemoveListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
         EventManager.RemoveCustomListener("HoverBuildingButton", OnHoverBuildingButton);
         EventManager.RemoveListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
+        EventManager.RemoveCustomListener("SelectUnit", _OnSelectUnit);
+        EventManager.RemoveCustomListener
+            ("DeselectUnit", _OnDeselectUnit);
     }
 
     private void AddBuildingButtonListener(Button button, int globalBuildingIndex)
@@ -99,7 +104,7 @@ public class UIManager : MonoBehaviour
         resourceTextFields[resourceName].text = value.Name + "\n" +  value.CurrentAmount.ToString();
     }
 
-    public void UpdateResourcesTexts()
+    public void OnUpdateResourcesTexts()
     {
         foreach(KeyValuePair<string, GameResource> pair in Globals.AVAILABLE_RESOURCES)
         {
@@ -107,7 +112,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void SetBuildingButtonInteractivity()
+    public void OnSetBuildingButtonInteractivity()
     {
         foreach (UnitData data in Globals.AVAILABLE_BUILDINGS_DATA)
         {
@@ -124,6 +129,51 @@ public class UIManager : MonoBehaviour
     private void OnUnhoverBuildingButton()
     {
         ShowInfoPanel(false);
+    }
+
+    private void _OnSelectUnit(CustomEventData data)
+    {
+        Unit unit = data.unit;
+        // if there is another unit of the same type already selected,
+        // increase the counter
+        Transform alreadyInstantiatedUnitDisplay = selectedUnitsParent.Find(unit.Code);
+        if (alreadyInstantiatedUnitDisplay != null)
+        {
+            TextMeshProUGUI t = alreadyInstantiatedUnitDisplay.Find("Count").GetComponent<TextMeshProUGUI>();
+            int count = int.Parse(t.text);
+            t.text = (count + 1).ToString();
+        }
+        // else create a brand new counter initialized with a count of 1
+        else
+        {
+            GameObject g = GameObject.Instantiate(selectedUnitDisplayPrefab, selectedUnitsParent);
+            g.name = unit.Code;
+            Transform t = g.transform;
+            t.Find("Count").GetComponent<TextMeshProUGUI>().text = "1";
+            t.Find("Title").GetComponent<TextMeshProUGUI>().text = unit.Data.unitName;
+        }
+    }
+
+    private void _OnDeselectUnit(CustomEventData data)
+    {
+        string code = data.unit.Code;
+
+        Transform unitDisplayItem = selectedUnitsParent.Find(code);
+        if (unitDisplayItem == null) return;
+
+        TextMeshProUGUI t = unitDisplayItem.Find("Count").GetComponent<TextMeshProUGUI>();
+        int count = int.Parse(t.text);
+        count -= 1;
+        if (count == 0)
+        {
+            DestroyImmediate(unitDisplayItem.gameObject);
+        }
+        else
+        {
+            t.text = count.ToString();
+        }
+
+
     }
 
     public void SetInfoPanel(UnitData data)

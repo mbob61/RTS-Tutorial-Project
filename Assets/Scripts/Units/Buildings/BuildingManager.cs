@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class BuildingManager : UnitManager
 {
+    private Building building;
+    protected override Unit Unit
+    {
+        get { return building; }
+        set { building = value is Building ? (Building)value : null; }
+    }
+
     [SerializeField] private LayerMask terrainLayer;
-    private BoxCollider boxCollider;
-    private Building building = null;
     private int numberOfCollisions = 0;
 
-    public void Initialize(Building building)
-    {
-        boxCollider = GetComponent<BoxCollider>();
-        this.building = building;
-    }
 
     private void OnTriggerEnter(Collider other)
     {

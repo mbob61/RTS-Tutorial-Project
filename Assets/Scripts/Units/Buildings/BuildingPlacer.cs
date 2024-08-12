@@ -76,7 +76,7 @@ public class BuildingPlacer : MonoBehaviour
         //buildingToPlace = null;
 
         //Allow continous building if we have the resources for it
-        if (buildingToPlace.CanBuy())
+        if (buildingToPlace.IsAffordable())
             {
                 PrepareBuildingWithIndexForPlacement(buildingToPlace.DataIndex);
             }

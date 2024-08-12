@@ -8,6 +8,14 @@ public class UnitManager : MonoBehaviour
     [SerializeField] private GameObject selectionIndicator;
     private Transform canvasTransform;
     private GameObject healthBar;
+    protected BoxCollider boxCollider;
+    protected virtual Unit Unit { get; set; }
+
+    public void Initialize(Unit unit)
+    {
+        boxCollider = GetComponent<BoxCollider>();
+        Unit = unit;
+    }
 
     private void Awake()
     {

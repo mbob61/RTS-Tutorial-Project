@@ -109,7 +109,7 @@ public class UIManager : MonoBehaviour
 
     public void SetBuildingButtonInteractivity()
     {
-        foreach (BuildingData data in Globals.AVAILABLE_BUILDINGS_DATA)
+        foreach (UnitData data in Globals.AVAILABLE_BUILDINGS_DATA)
         {
             buildingButtons[data.code].interactable = data.IsAffordable();
         }
@@ -117,7 +117,7 @@ public class UIManager : MonoBehaviour
 
     private void OnHoverBuildingButton(CustomEventData data)
     {
-        SetInfoPanel(data.buildingData);
+        SetInfoPanel(data.unitData);
         ShowInfoPanel(true);
     }
 
@@ -126,7 +126,7 @@ public class UIManager : MonoBehaviour
         ShowInfoPanel(false);
     }
 
-    public void SetInfoPanel(BuildingData data)
+    public void SetInfoPanel(UnitData data)
     {
         // update texts
         if (data.code != "")

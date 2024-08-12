@@ -21,9 +21,9 @@ public class Building
     public Building(BuildingData buildingData)
     {
         this.buildingData = buildingData;
-        currentHealth = buildingData.Health;
+        currentHealth = buildingData.healthpoints;
 
-        GameObject g = GameObject.Instantiate( Resources.Load($"Prefabs/Buildings/{buildingData.Code}"), new Vector3(0, 1000, 0), Quaternion.identity) as GameObject;
+        GameObject g = GameObject.Instantiate(buildingData.buildingPrefab, new Vector3(0, 1000, 0), Quaternion.identity) as GameObject;
         transform = g.transform;
 
         placementStatus = BuildingPlacementStatus.VALID;
@@ -59,9 +59,9 @@ public class Building
         transform.GetComponent<BoxCollider>().isTrigger = false;
 
         // Update the players resources by deducting the cost of the building
-        foreach (KeyValuePair<string, int> pair in buildingData.Cost)
+        foreach (ResourceValue value in buildingData.costs)
         {
-            Globals.AVAILABLE_RESOURCES[pair.Key].UpdateAmount(-pair.Value);
+            Globals.AVAILABLE_RESOURCES[value.code].UpdateAmount(-value.amount);
         }
     }
 
@@ -110,16 +110,16 @@ public class Building
 
     public bool HasFixedPlacementStatus { get => placementStatus == BuildingPlacementStatus.FIXED; }
     public bool HasValidPlacementStatus { get => placementStatus == BuildingPlacementStatus.VALID; }
-    public string Code { get => buildingData.Code; }
+    public string Code { get => buildingData.code; }
     public Transform Transform { get => transform; }
     public int HP { get => currentHealth; set => currentHealth = value; }
-    public int MaxHP { get => buildingData.Health; }
+    public int MaxHP { get => buildingData.healthpoints; }
     public int DataIndex
     {
         get                
         {
             for (int i = 0; i < Globals.AVAILABLE_BUILDINGS_DATA.Length; i++) {
-                if (Globals.AVAILABLE_BUILDINGS_DATA[i].Code == buildingData.Code)
+                if (Globals.AVAILABLE_BUILDINGS_DATA[i].code == buildingData.code)
                 {
                     return i;
                 }

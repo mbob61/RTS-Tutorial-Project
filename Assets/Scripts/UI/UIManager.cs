@@ -26,9 +26,9 @@ public class UIManager : MonoBehaviour
         {
             GameObject button = GameObject.Instantiate(buildingButtonPrefab, buildingMenuParent);
 
-            string code = Globals.AVAILABLE_BUILDINGS_DATA[i].Code;
+            string code = Globals.AVAILABLE_BUILDINGS_DATA[i].code;
             button.name = code;
-            button.transform.Find("Title").GetComponent<TextMeshProUGUI>().text = code;
+            button.transform.Find("Title").GetComponent<TextMeshProUGUI>().text = Globals.AVAILABLE_BUILDINGS_DATA[i].buildingName;
 
             Button buttonObject = button.GetComponent<Button>();
             AddBuildingButtonListener(buttonObject, i);
@@ -86,7 +86,7 @@ public class UIManager : MonoBehaviour
     {
         foreach (BuildingData data in Globals.AVAILABLE_BUILDINGS_DATA)
         {
-            buildingButtons[data.Code].interactable = data.IsAffordable();
+            buildingButtons[data.code].interactable = data.IsAffordable();
         }
     }
 }

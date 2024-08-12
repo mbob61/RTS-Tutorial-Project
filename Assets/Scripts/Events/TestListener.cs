@@ -27,6 +27,6 @@ public class TestListener : MonoBehaviour
 
     private void HandleCustomEvent(CustomEventData data)
     {
-        Debug.Log("Event received: " + data.buildingData.Code);
+        Debug.Log("Event received: " + data.buildingData.code);
     }
 }

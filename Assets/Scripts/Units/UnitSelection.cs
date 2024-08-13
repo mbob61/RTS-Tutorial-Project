@@ -4,11 +4,14 @@ using UnityEngine;
 
 public class UnitSelection : MonoBehaviour
 {
+    [SerializeField] UIManager uiManager;
     private bool _isDraggingMouseBox = false;
     private Vector3 _dragStartPosition = Vector3.zero;
 
     Ray ray;
     RaycastHit raycastHit;
+
+    private Dictionary<int, List<UnitManager>> selectionGroups = new Dictionary<int, List<UnitManager>>();
 
     private void Update()
     {
@@ -51,8 +54,56 @@ public class UnitSelection : MonoBehaviour
                 }
             }
         }
+
+        if (Input.anyKeyDown)
+        {
+            int alphaKey = Utils.GetAlphaKeyValue(Input.inputString);
+            if (alphaKey != -1)
+            {
+                if (Input.GetKey(KeyCode.LeftControl))
+                {
+                    CreateSelectionGroup(alphaKey);
+                } else
+                {
+                    SelectGroup(alphaKey);
+                }
+            }
+        }
     }
 
+    public void SelectGroupByButton(int index)
+    {
+        SelectGroup(index);
+    }
+
+    private void CreateSelectionGroup(int groupIndex)
+    {
+        if (Globals.CURRENTLY_SELECTED_UNITS.Count == 0)
+        {
+            if (selectionGroups.ContainsKey(groupIndex))
+            {
+                selectionGroups.Remove(groupIndex);
+                uiManager.ToggleSelectionGroupButton(groupIndex, false);
+                return;
+            }
+        }
+        List<UnitManager> selectedUnits = new List<UnitManager>(Globals.CURRENTLY_SELECTED_UNITS);
+        selectionGroups[groupIndex] = selectedUnits;
+        uiManager.ToggleSelectionGroupButton(groupIndex, true);
+        
+    }
+
+    private void SelectGroup(int groupIndex)
+    {
+        if (!selectionGroups.ContainsKey(groupIndex)) return;
+        DeselectAllUnits();
+        foreach(UnitManager unit in selectionGroups[groupIndex])
+        {
+            unit.SelectUnit(false, false);
+        }
+    }
+
+ 
     private void SelectUnitsInsideBox()
     {
         // Create the bounds for  the selection box

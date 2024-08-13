@@ -9,7 +9,7 @@ public class UnitManager : MonoBehaviour
     private Transform canvasTransform;
     private GameObject healthBar;
     protected BoxCollider boxCollider;
-    protected virtual Unit Unit { get; set; }
+    public virtual Unit Unit { get; set; }
 
     public void Initialize(Unit unit)
     {

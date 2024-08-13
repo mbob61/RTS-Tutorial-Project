@@ -21,6 +21,18 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Transform selectedUnitsParent;
     [SerializeField] private GameObject selectedUnitDisplayPrefab;
 
+    [SerializeField] private Transform selectionGroupsParent;
+
+    [SerializeField] private GameObject gameResourceProductionPrefab;
+    [SerializeField] private GameObject selectedUnitMenuParent;
+    private RectTransform selectedUnitContentRectTransform;
+    private RectTransform selectedUnitButtonsRectTransform;
+    private TextMeshProUGUI selectedUnitTitleText;
+    private TextMeshProUGUI selectedUnitLevelText;
+    private Transform selectedUnitResourcesProductionParent;
+    private Transform selectedUnitActionButtonsParent;
+
+
     private Dictionary<string, TextMeshProUGUI> resourceTextFields;
     private Dictionary<string, Button> buildingButtons;
 
@@ -56,7 +68,6 @@ public class UIManager : MonoBehaviour
             buildingButtons[code] = buttonObject;
             if (!Globals.AVAILABLE_BUILDINGS_DATA[i].IsAffordable())
             {
-                Debug.Log("Unaffordable");
                 buttonObject.interactable = false;
             }
             button.GetComponent<BuildingButton>().Initialize(Globals.AVAILABLE_BUILDINGS_DATA[i]);
@@ -70,7 +81,24 @@ public class UIManager : MonoBehaviour
             resourceDisplayPrefab.name = pair.Key;
             resourceTextFields[pair.Key] = resourceDisplayObject.transform.Find("Amount").GetComponent<TextMeshProUGUI>();
             SetResourcesText(pair.Key, pair.Value);
-        } 
+        }
+
+        // hide all selection group buttons
+        for (int i = 1; i <= 9; i++)
+        {
+            ToggleSelectionGroupButton(i, false);
+        }
+
+        Transform selectedUnitMenuTransform = selectedUnitMenuParent.transform;
+        selectedUnitContentRectTransform = selectedUnitMenuTransform.Find("Content").GetComponent<RectTransform>();
+        selectedUnitButtonsRectTransform = selectedUnitMenuTransform.Find("Buttons").GetComponent<RectTransform>();
+        selectedUnitTitleText = selectedUnitMenuTransform.Find("Content/Title").GetComponent<TextMeshProUGUI>();
+        selectedUnitLevelText = selectedUnitMenuTransform.Find("Content/Level").GetComponent<TextMeshProUGUI>();
+        selectedUnitResourcesProductionParent = selectedUnitMenuTransform.Find("Content/ResourcesParent");
+        selectedUnitActionButtonsParent = selectedUnitMenuTransform.Find("Buttons/SpecificActions");
+
+        ShowSelectedUnitMenu(false);
+
     }
 
     private void OnEnable()
@@ -133,7 +161,27 @@ public class UIManager : MonoBehaviour
 
     private void _OnSelectUnit(CustomEventData data)
     {
-        Unit unit = data.unit;
+        AddSelectedUnitToUIList(data.unit);
+        SetSelectedUnitMenu(data.unit);
+        ShowSelectedUnitMenu(true);
+    }
+
+    private void _OnDeselectUnit(CustomEventData data)
+    {
+        RemoveSelectedUnitFromUIList(data.unit.Code);
+        if (Globals.CURRENTLY_SELECTED_UNITS.Count == 0)
+        {
+            ShowSelectedUnitMenu(false);
+        }
+        else
+        {
+            SetSelectedUnitMenu(Globals.CURRENTLY_SELECTED_UNITS[Globals.CURRENTLY_SELECTED_UNITS.Count - 1].Unit);
+
+        }
+    }
+
+    private void AddSelectedUnitToUIList( Unit unit)
+    {
         // if there is another unit of the same type already selected,
         // increase the counter
         Transform alreadyInstantiatedUnitDisplay = selectedUnitsParent.Find(unit.Code);
@@ -154,10 +202,8 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void _OnDeselectUnit(CustomEventData data)
+    private void RemoveSelectedUnitFromUIList(string code)
     {
-        string code = data.unit.Code;
-
         Transform unitDisplayItem = selectedUnitsParent.Find(code);
         if (unitDisplayItem == null) return;
 
@@ -172,8 +218,6 @@ public class UIManager : MonoBehaviour
         {
             t.text = count.ToString();
         }
-
-
     }
 
     public void SetInfoPanel(UnitData data)
@@ -211,8 +255,43 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private void ShowSelectedUnitMenu(bool show)
+    {
+        selectedUnitMenuParent.SetActive(show);
+    }
+
+    public void ToggleSelectionGroupButton(int index, bool visible)
+    {
+        selectionGroupsParent.Find(index.ToString()).gameObject.SetActive(visible);
+    }
+
     public void ShowInfoPanel(bool show)
     {
         infoPanelParent.SetActive(show);
+    }
+
+    private void SetSelectedUnitMenu(Unit unit)
+    {
+        // adapt content panel heights to match info to display
+        int contentHeight = 60 + unit.Production.Count * 16;
+        selectedUnitContentRectTransform.sizeDelta = new Vector2(64, contentHeight);
+        selectedUnitButtonsRectTransform.anchoredPosition = new Vector2(0, -contentHeight - 20);
+        selectedUnitButtonsRectTransform.sizeDelta = new Vector2(70, Screen.height - contentHeight - 20);
+        // update texts
+        selectedUnitTitleText.text = unit.Data.unitName;
+        selectedUnitLevelText.text = $"Level {unit.Level}";
+        // clear resource production and reinstantiate new one
+        foreach (Transform child in selectedUnitResourcesProductionParent)
+            Destroy(child.gameObject);
+        if (unit.Production.Count > 0)
+        {
+            GameObject g; Transform t;
+            foreach (ResourceValue resource in unit.Production)
+            {
+                g = GameObject.Instantiate(gameResourceProductionPrefab, selectedUnitResourcesProductionParent);
+                t = g.transform;
+                t.Find("Text").GetComponent<TextMeshProUGUI>().text = $"{resource.code}: +{resource.amount}";
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class BuildingManager : UnitManager
 {
     private Building building;
-    protected override Unit Unit
+    public override Unit Unit
     {
         get { return building; }
         set { building = value is Building ? (Building)value : null; }

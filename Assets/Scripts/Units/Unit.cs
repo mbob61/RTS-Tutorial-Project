@@ -10,23 +10,29 @@ public class Unit {
     protected string uid;
     protected int level;
     protected List<ResourceValue> production;
+    protected List<SkillManager> skillManagers;
 
-    public Unit(UnitData data) : this(data, new List<ResourceValue>() { })
-    {
-    }
+    public Unit(UnitData data) : this(data, new List<ResourceValue>() { }){}
     public Unit(UnitData data, List<ResourceValue> production)
     {
         this.data = data;
         this.currentHealth = data.healthpoints;
 
-        GameObject g = GameObject.Instantiate(data.unitPrefab) as GameObject;
-        this.transform = g.transform;
+        GameObject instantiedUnit = GameObject.Instantiate(data.unitPrefab) as GameObject;
+        this.transform = instantiedUnit.transform;
 
         this.uid = System.Guid.NewGuid().ToString();
         this.level = 1;
         this.production = production;
 
-
+        skillManagers = new List<SkillManager>();
+        SkillManager sm;
+        foreach (SkillData skill in data.skills)
+        {
+            sm = instantiedUnit.AddComponent<SkillManager>();
+            sm.Initialize(skill, instantiedUnit);
+            skillManagers.Add(sm);
+        }
     }
 
     public void SetPosition(Vector3 position)
@@ -64,6 +70,12 @@ public class Unit {
         }
     }
 
+    public void TriggerSkill(int index, GameObject target = null)
+    {
+        Debug.Log("I'm triggering");
+        skillManagers[index].Trigger(target);
+    }
+
     public UnitData Data { get => data; }
     public string Code { get => data.code; }
     public Transform Transform { get => transform; }
@@ -72,5 +84,6 @@ public class Unit {
     public string Uid { get => uid; }
     public int Level { get => level; }
     public List<ResourceValue> Production { get => production; }
+    public List<SkillManager> SkillManagers { get => skillManagers; }
 
 }

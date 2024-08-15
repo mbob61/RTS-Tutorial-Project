@@ -24,3 +24,5 @@ MonoBehaviour:
     amount: 100
   - code: stone
     amount: 100
+  skills:
+  - {fileID: 11400000, guid: 8d820d4b76baf466a809907b9647363f, type: 2}

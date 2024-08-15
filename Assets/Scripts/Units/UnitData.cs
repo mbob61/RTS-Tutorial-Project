@@ -10,6 +10,7 @@ public class UnitData : ScriptableObject
     public int healthpoints;
     public GameObject unitPrefab;
     public List<ResourceValue> costs;
+    public List<SkillData> skills = new List<SkillData>();
 
     public bool IsAffordable()
     {

@@ -32,6 +32,8 @@ public class UIManager : MonoBehaviour
     private Transform selectedUnitResourcesProductionParent;
     private Transform selectedUnitActionButtonsParent;
 
+    private Unit selectedUnit;
+    [SerializeField] private GameObject unitSkillButtonPrefab;
 
     private Dictionary<string, TextMeshProUGUI> resourceTextFields;
     private Dictionary<string, Button> buildingButtons;
@@ -182,6 +184,8 @@ public class UIManager : MonoBehaviour
 
     private void AddSelectedUnitToUIList( Unit unit)
     {
+        selectedUnit = unit;
+
         // if there is another unit of the same type already selected,
         // increase the counter
         Transform alreadyInstantiatedUnitDisplay = selectedUnitsParent.Find(unit.Code);
@@ -199,6 +203,28 @@ public class UIManager : MonoBehaviour
             Transform t = g.transform;
             t.Find("Count").GetComponent<TextMeshProUGUI>().text = "1";
             t.Find("Title").GetComponent<TextMeshProUGUI>().text = unit.Data.unitName;
+        }
+
+        // clear skills and make new ones
+        foreach(Transform child in selectedUnitActionButtonsParent)
+        {
+            Destroy(child.gameObject);
+        }
+        if (unit.SkillManagers.Count > 0)
+        {
+            GameObject gm;
+            Transform t;
+            Button b;
+
+            for (int i = 0; i < unit.SkillManagers.Count; i++)
+            {
+                gm = GameObject.Instantiate(unitSkillButtonPrefab, selectedUnitActionButtonsParent);
+                t = gm.transform;
+                b = gm.GetComponent<Button>();
+                unit.SkillManagers[i].SetButton(b);
+                t.Find("Title").GetComponent<TextMeshProUGUI>().text = unit.SkillManagers[i].skill.skillName;
+                AddUnitSKillButtonListener(b, i);
+            }
         }
     }
 
@@ -293,5 +319,10 @@ public class UIManager : MonoBehaviour
                 t.Find("Text").GetComponent<TextMeshProUGUI>().text = $"{resource.code}: +{resource.amount}";
             }
         }
+    }
+
+    private void AddUnitSKillButtonListener(Button b, int index)
+    {
+        b.onClick.AddListener(() => selectedUnit.TriggerSkill(index));
     }
 }

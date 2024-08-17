@@ -72,7 +72,7 @@ public class UnitManager : MonoBehaviour
 
     private void Select()
     {
-        EventManager.TriggerCustomEvent("SelectUnit", new CustomEventData(Unit));
+        EventManager.TriggerEvent("SelectUnit", Unit);
 
         Globals.CURRENTLY_SELECTED_UNITS.Add(this);
         selectionIndicator.SetActive(true);
@@ -101,7 +101,7 @@ public class UnitManager : MonoBehaviour
 
         Destroy(healthBar);
         healthBar = null;
-        EventManager.TriggerCustomEvent("DeselectUnit", new CustomEventData(Unit));
+        EventManager.TriggerEvent("DeselectUnit", Unit);
 
     }
 

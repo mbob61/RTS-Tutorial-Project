@@ -107,21 +107,20 @@ public class UIManager : MonoBehaviour
     {
         EventManager.AddListener("UpdateResourceText", OnUpdateResourcesTexts);
         EventManager.AddListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
-        EventManager.AddCustomListener("HoverBuildingButton", OnHoverBuildingButton);
+        EventManager.AddListener("HoverBuildingButton", OnHoverBuildingButton);
         EventManager.AddListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
-        EventManager.AddCustomListener("SelectUnit", _OnSelectUnit);
-        EventManager.AddCustomListener("DeselectUnit", _OnDeselectUnit);
+        EventManager.AddListener("SelectUnit", _OnSelectUnit);
+        EventManager.AddListener("DeselectUnit", _OnDeselectUnit);
     }
 
     private void OnDisable()
     {
         EventManager.RemoveListener("UpdateResourceText", OnUpdateResourcesTexts);
         EventManager.RemoveListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
-        EventManager.RemoveCustomListener("HoverBuildingButton", OnHoverBuildingButton);
+        EventManager.RemoveListener("HoverBuildingButton", OnHoverBuildingButton);
         EventManager.RemoveListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
-        EventManager.RemoveCustomListener("SelectUnit", _OnSelectUnit);
-        EventManager.RemoveCustomListener
-            ("DeselectUnit", _OnDeselectUnit);
+        EventManager.RemoveListener("SelectUnit", _OnSelectUnit);
+        EventManager.RemoveListener("DeselectUnit", _OnDeselectUnit);
     }
 
     private void AddBuildingButtonListener(Button button, int globalBuildingIndex)
@@ -150,9 +149,10 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void OnHoverBuildingButton(CustomEventData data)
+    private void OnHoverBuildingButton(object data)
     {
-        SetInfoPanel(data.unitData);
+
+        SetInfoPanel((UnitData) data);
         ShowInfoPanel(true);
     }
 
@@ -161,16 +161,20 @@ public class UIManager : MonoBehaviour
         ShowInfoPanel(false);
     }
 
-    private void _OnSelectUnit(CustomEventData data)
+    private void _OnSelectUnit(object data)
     {
-        AddSelectedUnitToUIList(data.unit);
-        SetSelectedUnitMenu(data.unit);
+        Unit unit = (Unit)data;
+
+        AddSelectedUnitToUIList(unit);
+        SetSelectedUnitMenu(unit);
         ShowSelectedUnitMenu(true);
     }
 
-    private void _OnDeselectUnit(CustomEventData data)
+    private void _OnDeselectUnit(object data)
     {
-        RemoveSelectedUnitFromUIList(data.unit.Code);
+        Unit unit = (Unit) data;
+
+        RemoveSelectedUnitFromUIList(unit.Code);
         if (Globals.CURRENTLY_SELECTED_UNITS.Count == 0)
         {
             ShowSelectedUnitMenu(false);

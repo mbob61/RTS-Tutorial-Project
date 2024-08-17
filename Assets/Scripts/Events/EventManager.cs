@@ -6,33 +6,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+[System.Serializable]
+public class CustomEvent : UnityEvent<object>
+{
+}
+
 public class EventManager : MonoBehaviour
 {
+    private Dictionary<string, UnityEvent> events;
+    private Dictionary<string, CustomEvent> customEvents;
     private static EventManager eventManager;
-    public static EventManager instance
+
+    public static EventManager Instance
     {
         get
         {
             if (!eventManager)
             {
                 eventManager = FindObjectOfType(typeof(EventManager)) as EventManager;
+
                 if (!eventManager)
                 {
-                    Debug.LogError("There needs to be one active EventManager script on a GameObject in your scene.");
-                }
-                else
+                    Debug.LogError("There needs to be an active object with an EventManager component");
+                } else
                 {
-                    eventManager.init();
+                    eventManager.Init();
                 }
             }
             return eventManager;
         }
     }
 
-    private Dictionary<string, UnityEvent> events;
-    private Dictionary<string, CustomEvent> customEvents;
-   
-    private void init()
+    private void Init()
     {
         if (events == null)
         {
@@ -44,26 +49,46 @@ public class EventManager : MonoBehaviour
     public static void AddListener(string eventName, UnityAction listener)
     {
         UnityEvent evt = null;
-        if (instance.events.TryGetValue(eventName, out evt))
+        if (Instance.events.TryGetValue(eventName, out evt))
         {
             evt.AddListener(listener);
         } else
         {
             evt = new UnityEvent();
             evt.AddListener(listener);
-            instance.events.Add(eventName, evt);
+            Instance.events.Add(eventName, evt);
+        }
+    }
+
+    public static void AddListener(string eventName, UnityAction<object> listener)
+    {
+        CustomEvent evt = null;
+        if (Instance.customEvents.TryGetValue(eventName, out evt))
+        {
+            evt.AddListener(listener);
+        } else
+        {
+            evt = new CustomEvent();
+            evt.AddListener(listener);
+            Instance.customEvents.Add(eventName, evt);
         }
     }
 
     public static void RemoveListener(string eventName, UnityAction listener)
     {
-        if (eventManager == null)
-        {
-            return;
-        }
-
+        if (eventManager == null) return;
         UnityEvent evt = null;
-        if (instance.events.TryGetValue(eventName, out evt))
+        if (Instance.events.TryGetValue(eventName, out evt))
+        {
+            evt.RemoveListener(listener);
+        }
+    }
+
+    public static void RemoveListener(string eventName, UnityAction<object> listener)
+    {
+        if (eventManager == null) return;
+        CustomEvent evt = null;
+        if (Instance.customEvents.TryGetValue(eventName, out evt))
         {
             evt.RemoveListener(listener);
         }
@@ -72,39 +97,18 @@ public class EventManager : MonoBehaviour
     public static void TriggerEvent(string eventName)
     {
         UnityEvent evt = null;
-        if (instance.events.TryGetValue(eventName, out evt))
+        if (Instance.events.TryGetValue(eventName, out evt))
         {
             evt.Invoke();
         }
     }
-
-    public static void AddCustomListener(string eventName, UnityAction<CustomEventData> listener)
+    public static void TriggerEvent(string eventName, object data)
     {
         CustomEvent evt = null;
-        if (instance.customEvents.TryGetValue(eventName, out evt))
+        if (Instance.customEvents.TryGetValue(eventName, out evt))
         {
-            evt.AddListener(listener);
-        }
-        else
-        {
-            evt = new CustomEvent();
-            evt.AddListener(listener);
-            instance.customEvents.Add(eventName, evt);
-        }
-    }
-
-    public static void RemoveCustomListener(string eventName, UnityAction<CustomEventData> listener)
-    {
-        if (eventManager == null) return;
-        CustomEvent evt = null;
-        if (instance.customEvents.TryGetValue(eventName, out evt))
-            evt.RemoveListener(listener);
-    }
-
-    public static void TriggerCustomEvent(string eventName, CustomEventData data)
-    {
-        CustomEvent evt = null;
-        if (instance.customEvents.TryGetValue(eventName, out evt))
             evt.Invoke(data);
+        }
     }
+
 }

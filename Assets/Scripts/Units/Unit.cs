@@ -72,7 +72,6 @@ public class Unit {
 
     public void TriggerSkill(int index, GameObject target = null)
     {
-        Debug.Log("I'm triggering");
         skillManagers[index].Trigger(target);
     }
 

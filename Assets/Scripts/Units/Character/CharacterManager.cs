@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class CharacterManager : UnitManager
 {
@@ -10,15 +11,12 @@ public class CharacterManager : UnitManager
         set => character = value is Character ? (Character)value : null;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private NavMeshAgent agent;
+
+    public void MoveTo(Vector3 position)
     {
-        
+        agent.destination = position;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }

@@ -4,17 +4,29 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private GameParameters gameParameters;
+    public GameParameters gameParameters;
     [SerializeField] private LayerMask terrainLayer;
 
     private Ray ray;
     private RaycastHit raycastHit;
+
+    public static GameManager instance;
+    public Vector3 startPosition;
 
     private void Awake()
     {
         DataHandler.LoadGameData();
 
         GetComponent<DayNightCycler>().enabled = gameParameters.enableDayAndNightCycle;
+
+        startPosition = Utils.MiddleOfScreenPointToWorld();
+    }
+
+    public void Start()
+    {
+        print("DO I EVER GET HERE?");
+        instance = this;
+        print(instance);
     }
 
     void Update()

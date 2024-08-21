@@ -12,6 +12,22 @@ public class BuildingPlacer : MonoBehaviour
     private Vector3 lastPlacementPosition;
     [SerializeField] private LayerMask terrainLayer;
 
+    private void Start()
+    {
+        // instantiate headquarters at the beginning of the game
+
+        print(GameManager.instance);
+
+        buildingToPlace = new Building(GameManager.instance.gameParameters.initialBuilding);
+        buildingToPlace.SetPosition(GameManager.instance.startPosition);
+        // link the data into the manager
+        buildingToPlace.Transform.GetComponent<BuildingManager>().Initialize(buildingToPlace);
+        PlaceBuilding();
+        // make sure we have no building selected when the player starts
+        // to play
+        _CancelPlacedBuilding();
+    }
+
     private void Update()
     {
         if (buildingToPlace != null)
@@ -62,6 +78,7 @@ public class BuildingPlacer : MonoBehaviour
     private void _CancelPlacedBuilding()
     {
         //Destroy the "phantom" building
+        if (buildingToPlace == null) return;
         Destroy(buildingToPlace.Transform.gameObject);
         buildingToPlace = null;
     }

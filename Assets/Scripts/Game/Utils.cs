@@ -113,4 +113,20 @@ public class Utils : MonoBehaviour
         if (inputString == "9" || inputString == "ç") return 9;
         return -1;
     }
+
+    public static Vector3 MiddleOfScreenPointToWorld()
+    { return MiddleOfScreenPointToWorld(Camera.main); }
+
+    public static Vector3 MiddleOfScreenPointToWorld(Camera cam)
+    {
+        RaycastHit hit;
+        Ray ray = cam.ScreenPointToRay(0.5f * new Vector2(Screen.width, Screen.height));
+        if (Physics.Raycast(
+                ray,
+                out hit,
+                1000f,
+                LayerMask.GetMask("Terrain")
+            )) return hit.point;
+        return Vector3.zero;
+    }
 }

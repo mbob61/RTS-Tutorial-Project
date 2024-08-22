@@ -15,7 +15,7 @@ public class BuildingPlacer : MonoBehaviour
     private void Start()
     {
         // instantiate headquarters at the beginning of the game
-        buildingToPlace = new Building(GameManager.instance.gameParameters.initialBuilding);
+        buildingToPlace = new Building(GameManager.instance.gameGlobalParameters.initialBuilding);
         buildingToPlace.SetPosition(GameManager.instance.startPosition);
         // link the data into the manager
         buildingToPlace.Transform.GetComponent<BuildingManager>().Initialize(buildingToPlace);

@@ -2,10 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Parameters", menuName = "Scriptable Objects/Parameters")]
-public class GameParameters : ScriptableObject
+[CreateAssetMenu(fileName = "Global Parameters", menuName = "Scriptable Objects/Game Global Parameters", order = 10)]
+public class GameGlobalParameters : GameParameters
 {
-
     [Header("Day and Night")]
     public bool enableDayAndNightCycle;
     public float dayLengthInSeconds;
@@ -13,4 +12,7 @@ public class GameParameters : ScriptableObject
 
     [Header("Initialization")]
     public BuildingData initialBuilding;
+
+    public override string GetParametersName() => "Global";
+
 }

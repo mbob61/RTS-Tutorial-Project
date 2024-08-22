@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameParameters gameParameters;
+    public GameGlobalParameters gameGlobalParameters;
     [SerializeField] private LayerMask terrainLayer;
 
     private Ray ray;
@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     {
         DataHandler.LoadGameData();
 
-        GetComponent<DayNightCycler>().enabled = gameParameters.enableDayAndNightCycle;
+        GetComponent<DayNightCycler>().enabled = gameGlobalParameters.enableDayAndNightCycle;
 
         startPosition = Utils.MiddleOfScreenPointToWorld();
     }
@@ -25,6 +25,18 @@ public class GameManager : MonoBehaviour
     public void Start()
     {
         instance = this;
+
+        //// load all possible game parameters assets
+        //GameParameters[] gameParametersList = Resources.LoadAll<GameParameters>("ScriptableObjects/Parameters");
+        //foreach (GameParameters parameters in gameParametersList)
+        //{
+        //    Debug.Log(parameters.GetParametersName());
+        //    Debug.Log("> Fields shown in-game:");
+        //    foreach (string fieldName in parameters.FieldsToShowInGame)
+        //    {
+        //        Debug.Log($"    {fieldName}");
+        //    }
+        //}
     }
 
     void Update()

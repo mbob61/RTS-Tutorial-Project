@@ -15,8 +15,17 @@ public class CharacterManager : UnitManager
 
     public void MoveTo(Vector3 position)
     {
+        NavMeshPath path = new NavMeshPath();
+        agent.CalculatePath(position, path);
+        if (path.status == NavMeshPathStatus.PathInvalid)
+        {
+            contextualSource.PlayOneShot(((CharacterData)Unit.Data).onMoveInvalidSound);
+            return;
+        }
         agent.destination = position;
+        contextualSource.PlayOneShot(((CharacterData)Unit.Data).onMoveValidSound);
+
     }
 
-    
+
 }

@@ -21,3 +21,6 @@ MonoBehaviour:
   - code: wood
     amount: 10
   skills: []
+  onSelectSound: {fileID: 8300000, guid: b2ec01e049eaa469a848e7e70578095b, type: 3}
+  onMoveValidSound: {fileID: 8300000, guid: fc368c3517fcc451787d10385f0b991b, type: 3}
+  onMoveInvalidSound: {fileID: 8300000, guid: 1ff665c23a1564caf9cee11c287679a5, type: 3}

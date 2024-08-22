@@ -27,12 +27,16 @@ public class CameraManager : MonoBehaviour
 
     private Coroutine mouseOnScreenCoroutine;
 
+    [SerializeField] private Transform groundTarget;
+
     private void Awake()
     {
         _camera = GetComponent<Camera>();
         forwardVector = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
         mouseOnScreenBorder = -1;
         mouseOnScreenCoroutine = null;
+
+        groundTarget.position = Utils.MiddleOfScreenPointToWorld();
     }
 
     private void Update()
@@ -93,6 +97,8 @@ public class CameraManager : MonoBehaviour
         {
             transform.position = raycastHit.point + Vector3.up * desiredAltitude;
         }
+
+        ComputeMinimapIndicator(false);
     }
 
     private IEnumerator SetMouseOnScreenBorder(int borderIndex)
@@ -118,5 +124,11 @@ public class CameraManager : MonoBehaviour
     {
         StopCoroutine(mouseOnScreenCoroutine);
         mouseOnScreenBorder = -1;
+    }
+
+    private void ComputeMinimapIndicator(bool zooming)
+    {
+        Vector3 middleOfTheScreen = Utils.MiddleOfScreenPointToWorld();
+        groundTarget.position = middleOfTheScreen;
     }
 }

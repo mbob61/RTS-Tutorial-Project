@@ -29,9 +29,23 @@ public class DayNightCycler : MonoBehaviour
 
     private IEnumerator UpdateStars()
     {
+        float rotation = 0f;
         while (true)
         {
+            rotation = (rotation + rotationAngleStep) % 360f;
             starsTransform.Rotate(rotationAxis, rotationAngleStep, Space.World);
+
+            // check for specific time of day, to play matching sound if need be
+            if (rotation <= 90f && rotation + rotationAngleStep > 90f)
+            {
+                EventManager.TriggerEvent("PlaySoundByName", "onNightStartSound");
+            }
+
+            if (rotation <= 270f && rotation + rotationAngleStep > 270f)
+            {
+                EventManager.TriggerEvent("PlaySoundByName", "onDayStartSound");
+            }
+
             yield return new WaitForSeconds(starsRefreshRate);
 
         }

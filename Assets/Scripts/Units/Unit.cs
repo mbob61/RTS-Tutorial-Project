@@ -50,6 +50,8 @@ public class Unit {
         {
             Globals.AVAILABLE_RESOURCES[value.code].UpdateAmount(-value.amount);
         }
+
+        EventManager.TriggerEvent("PlaySoundByName", "buildingCompleted");
     }
 
     public bool IsAffordable()

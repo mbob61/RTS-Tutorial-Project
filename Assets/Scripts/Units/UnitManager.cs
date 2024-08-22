@@ -11,6 +11,8 @@ public class UnitManager : MonoBehaviour
     protected BoxCollider boxCollider;
     public virtual Unit Unit { get; set; }
 
+    public AudioSource contextualSource;
+
     public void Initialize(Unit unit)
     {
         boxCollider = GetComponent<BoxCollider>();
@@ -89,6 +91,9 @@ public class UnitManager : MonoBehaviour
             h.InitializeHealthBar(transform, boundingBox.height);
             h.SetPosition();
         }
+
+        //play sound
+        contextualSource.PlayOneShot(Unit.Data.onSelectSound);
     }
 
     public void DeselectUnit()

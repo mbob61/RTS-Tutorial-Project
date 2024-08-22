@@ -12,6 +12,9 @@ public class UnitData : ScriptableObject
     public List<ResourceValue> costs;
     public List<SkillData> skills = new List<SkillData>();
 
+    [Header("General Sounds")]
+    public AudioClip onSelectSound;
+
     public bool IsAffordable()
     {
         foreach (ResourceValue cost in costs)

@@ -24,9 +24,7 @@ public class GameManager : MonoBehaviour
 
     public void Start()
     {
-        print("DO I EVER GET HERE?");
         instance = this;
-        print(instance);
     }
 
     void Update()

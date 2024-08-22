@@ -12,8 +12,14 @@ public class BuildingManager : UnitManager
     }
 
     [SerializeField] private LayerMask terrainLayer;
+    [SerializeField] private AudioSource ambientSource;
     private int numberOfCollisions = 0;
 
+    private void Start()
+    {
+        //ambientSource.PlayOneShot(((BuildingData)building.Data).ambientSound);
+
+    }
 
     private void OnTriggerEnter(Collider other)
     {

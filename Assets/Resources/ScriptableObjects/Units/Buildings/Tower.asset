@@ -20,3 +20,6 @@ MonoBehaviour:
   costs:
   - code: gold
     amount: 10
+  skills: []
+  onSelectSound: {fileID: 8300000, guid: b2ec01e049eaa469a848e7e70578095b, type: 3}
+  ambientSound: {fileID: 0}

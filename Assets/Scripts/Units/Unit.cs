@@ -55,10 +55,15 @@ public class Unit {
             // Update the players resources by deducting the cost of the building
             foreach (ResourceValue value in data.costs)
             {
-                Globals.AVAILABLE_RESOURCES[value.code].UpdateAmount(-value.amount);
+                Globals.AVAILABLE_RESOURCES[value.code].AddAmount(-value.amount);
             }
 
             EventManager.TriggerEvent("PlaySoundByName", "buildingCompleted");
+
+            if (production.Count > 0)
+            {
+                GameManager.instance.ownedResourceProducingUnits.Add(this);
+            }
         }
     }
 
@@ -74,9 +79,9 @@ public class Unit {
 
     public void ProduceResources()
     {
-        foreach (ResourceValue resource in this.production)
+        foreach (ResourceValue resource in production)
         {
-            Globals.AVAILABLE_RESOURCES[resource.code].UpdateAmount(resource.amount);
+            Globals.AVAILABLE_RESOURCES[resource.code].AddAmount(resource.amount);
         }
     }
 

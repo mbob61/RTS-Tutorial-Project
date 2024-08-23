@@ -17,7 +17,13 @@ public class BuildingPlacer : MonoBehaviour
         SpawnBuilding(
             GameManager.instance.gameGlobalParameters.initialBuilding,
             GameManager.instance.gamePlayerParameters.myPlayerId,
-            GameManager.instance.startPosition
+            GameManager.instance.startPosition,
+            new List<ResourceValue>()
+            {
+                new ResourceValue("gold", 5),
+                new ResourceValue("wood", 3),
+                new ResourceValue("stone", 2),
+            }
         );
     }
 
@@ -120,9 +126,7 @@ public class BuildingPlacer : MonoBehaviour
         Building previousBuilding = buildingToPlace;
 
         // instantiate headquarters at the beginning of the game
-        buildingToPlace = new Building(
-            GameManager.instance.gameGlobalParameters.initialBuilding,
-            GameManager.instance.gamePlayerParameters.myPlayerId);
+        buildingToPlace = new Building(data, owner, resources);
 
         buildingToPlace.SetPosition(GameManager.instance.startPosition);
         // link the data into the manager

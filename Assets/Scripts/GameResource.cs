@@ -13,7 +13,7 @@ public class GameResource
         this.currentAmount = initialAmount;
     }
 
-    public void UpdateAmount(int amount)
+    public void AddAmount(int amount)
     {
         currentAmount += amount;
         if (currentAmount < 0) currentAmount = 0;

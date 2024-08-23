@@ -16,6 +16,10 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public bool gameIsPaused;
     public GamePlayerParameters gamePlayerParameters;
 
+    [HideInInspector] public List<Unit> ownedResourceProducingUnits = new List<Unit>();
+    private float resourceProductionRate = 1f;
+    private Coroutine resourceProductionCoroutine = null;
+
     private void Awake()
     {
         DataHandler.LoadGameData();
@@ -31,17 +35,7 @@ public class GameManager : MonoBehaviour
     {
         instance = this;
 
-        //// load all possible game parameters assets
-        //GameParameters[] gameParametersList = Resources.LoadAll<GameParameters>("ScriptableObjects/Parameters");
-        //foreach (GameParameters parameters in gameParametersList)
-        //{
-        //    Debug.Log(parameters.GetParametersName());
-        //    Debug.Log("> Fields shown in-game:");
-        //    foreach (string fieldName in parameters.FieldsToShowInGame)
-        //    {
-        //        Debug.Log($"    {fieldName}");
-        //    }
-        //}
+        resourceProductionCoroutine = StartCoroutine("ProduceResources");
     }
 
     void Update()
@@ -54,16 +48,13 @@ public class GameManager : MonoBehaviour
     {
         if (Globals.CURRENTLY_SELECTED_UNITS.Count > 0 && Input.GetMouseButtonUp(1))
         {
-            print("at least one selected and mouse up");
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out raycastHit, 1000f, terrainLayer))
             {
-                print("I've hit the floor");
                 foreach (UnitManager unit in Globals.CURRENTLY_SELECTED_UNITS)
                 {
                     if (unit.GetType() == typeof(CharacterManager))
                     {
-                        print("I have a character manager");
                         ((CharacterManager)unit).MoveTo(raycastHit.point);
                     }
                 }
@@ -86,11 +77,33 @@ public class GameManager : MonoBehaviour
     private void OnPauseGame()
     {
         gameIsPaused = true;
+        if (resourceProductionCoroutine != null)
+        {
+            StopCoroutine(resourceProductionCoroutine);
+            resourceProductionCoroutine = null;
+        }
     }
 
     private void OnResumeGame()
     {
         gameIsPaused = false;
+        if (resourceProductionCoroutine == null)
+        {
+            resourceProductionCoroutine = StartCoroutine("ProduceResources");
+        }
+    }
+
+    private IEnumerator ProduceResources()
+    {
+        while (true)
+        {
+            foreach(Unit unit in ownedResourceProducingUnits)
+            {
+                unit.ProduceResources();
+            }
+            EventManager.TriggerEvent("UpdateResourceText");
+            yield return new WaitForSeconds(resourceProductionRate);
+        }
     }
 
     private void OnApplicationQuit()

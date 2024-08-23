@@ -37,10 +37,13 @@ public class SkillData : ScriptableObject
                         );
 
                     CharacterData data = (CharacterData)unitReference;
-                    Character character = new Character(data);
+
+                    UnitManager sourceUnitManager = source.GetComponent<UnitManager>();
+                    if (sourceUnitManager == null) return;
+
+                    Character character = new Character(data, sourceUnitManager.Unit.Owner);
                     //character.Transform.position = instantiationPosition;
                     character.Transform.GetComponent<NavMeshAgent>().Warp(instantiationPosition);
-                    character.Transform.GetComponent<CharacterManager>().Initialize(character);
                 }
                 break;
             default:

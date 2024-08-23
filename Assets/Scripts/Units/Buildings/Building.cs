@@ -15,8 +15,8 @@ public class Building : Unit
     private List<Material> materials;
     private BuildingManager buildingManager;
 
-    public Building(BuildingData data) : this(data, new List<ResourceValue>() { }) { }
-    public Building(BuildingData data, List<ResourceValue> production) : base(data, production)
+    public Building(BuildingData data, int owner) : this(data, owner, new List<ResourceValue>() { }) { }
+    public Building(BuildingData data, int owner, List<ResourceValue> production) : base(data, owner, production)
     {
         buildingManager = transform.GetComponent<BuildingManager>();
         materials = new List<Material>();

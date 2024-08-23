@@ -16,6 +16,8 @@ public class UnitSelection : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.instance.gameIsPaused) return;
+
         if (EventSystem.current.IsPointerOverGameObject()) return;
 
         // Start creating the drag box

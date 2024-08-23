@@ -13,6 +13,8 @@ public class UnitManager : MonoBehaviour
 
     public AudioSource contextualSource;
 
+    public int ownerMaterialSlotIndex = 0;
+
     public void Initialize(Unit unit)
     {
         boxCollider = GetComponent<BoxCollider>();
@@ -26,7 +28,7 @@ public class UnitManager : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (IsReadyForSelection())
+        if (IsReadyForSelection() && IsMyUnit())
         {
             SelectUnit(true, Input.GetKey(KeyCode.LeftShift));
         }
@@ -113,5 +115,18 @@ public class UnitManager : MonoBehaviour
     protected virtual bool IsReadyForSelection()
     {
         return true;
+    }
+
+    private bool IsMyUnit()
+    {
+        return Unit.Owner == GameManager.instance.gamePlayerParameters.myPlayerId;
+    }
+
+    public void SetOwnerMaterial(int owner)
+    {
+        Color playerColor = GameManager.instance.gamePlayerParameters.players[owner].color;
+        Material[] materials = transform.Find("Mesh").GetComponent<Renderer>().materials;
+        materials[ownerMaterialSlotIndex].color = playerColor;
+        transform.Find("Mesh").GetComponent<Renderer>().materials = materials;
     }
 }

@@ -11,15 +11,18 @@ public class Unit {
     protected int level;
     protected List<ResourceValue> production;
     protected List<SkillManager> skillManagers;
+    protected int owner;
 
-    public Unit(UnitData data) : this(data, new List<ResourceValue>() { }){}
-    public Unit(UnitData data, List<ResourceValue> production)
+    public Unit(UnitData data, int owner) : this(data, owner, new List<ResourceValue>() { }){}
+    public Unit(UnitData data, int owner, List<ResourceValue> production)
     {
         this.data = data;
         this.currentHealth = data.healthpoints;
+        this.owner = owner;
 
         GameObject instantiedUnit = GameObject.Instantiate(data.unitPrefab) as GameObject;
         this.transform = instantiedUnit.transform;
+        transform.GetComponent<UnitManager>().SetOwnerMaterial(owner);
 
         this.uid = System.Guid.NewGuid().ToString();
         this.level = 1;
@@ -33,6 +36,8 @@ public class Unit {
             sm.Initialize(skill, instantiedUnit);
             skillManagers.Add(sm);
         }
+
+        transform.GetComponent<UnitManager>().Initialize(this);
     }
 
     public void SetPosition(Vector3 position)
@@ -45,13 +50,16 @@ public class Unit {
         //Remove the "is_trigger" from the collider so the buildings can have collisions
         transform.GetComponent<BoxCollider>().isTrigger = false;
 
-        // Update the players resources by deducting the cost of the building
-        foreach (ResourceValue value in data.costs)
+        if (owner == GameManager.instance.gamePlayerParameters.myPlayerId)
         {
-            Globals.AVAILABLE_RESOURCES[value.code].UpdateAmount(-value.amount);
-        }
+            // Update the players resources by deducting the cost of the building
+            foreach (ResourceValue value in data.costs)
+            {
+                Globals.AVAILABLE_RESOURCES[value.code].UpdateAmount(-value.amount);
+            }
 
-        EventManager.TriggerEvent("PlaySoundByName", "buildingCompleted");
+            EventManager.TriggerEvent("PlaySoundByName", "buildingCompleted");
+        }
     }
 
     public bool IsAffordable()
@@ -86,5 +94,5 @@ public class Unit {
     public int Level { get => level; }
     public List<ResourceValue> Production { get => production; }
     public List<SkillManager> SkillManagers { get => skillManagers; }
-
+    public int Owner { get => owner; }
 }

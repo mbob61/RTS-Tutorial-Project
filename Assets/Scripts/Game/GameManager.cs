@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     public Vector3 startPosition;
 
+    [HideInInspector] public bool gameIsPaused;
+    public GamePlayerParameters gamePlayerParameters;
+
     private void Awake()
     {
         DataHandler.LoadGameData();
@@ -20,6 +23,8 @@ public class GameManager : MonoBehaviour
         GetComponent<DayNightCycler>().enabled = gameGlobalParameters.enableDayAndNightCycle;
 
         startPosition = Utils.MiddleOfScreenPointToWorld();
+
+        gameIsPaused = false;
     }
 
     public void Start()
@@ -41,6 +46,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        if (gameIsPaused) return;
         CheckUnitNavigation();
     }
 
@@ -64,4 +70,34 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
+    private void OnEnable()
+    {
+        EventManager.AddListener("PauseGame", OnPauseGame);
+        EventManager.AddListener("ResumeGame", OnResumeGame);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.RemoveListener("PauseGame", OnPauseGame);
+        EventManager.RemoveListener("ResumeGame", OnResumeGame);
+    }
+
+    private void OnPauseGame()
+    {
+        gameIsPaused = true;
+    }
+
+    private void OnResumeGame()
+    {
+        gameIsPaused = false;
+    }
+
+    private void OnApplicationQuit()
+    {
+#if !UNITY_EDITOR
+        DataHandler.SaveGameData();
+#endif
+    }
+
 }

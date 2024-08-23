@@ -10,6 +10,8 @@ public class DayNightCycler : MonoBehaviour
     private float rotationAngleStep;
     private Vector3 rotationAxis;
 
+    private Coroutine starsCoroutine = null;
+
     private void Start()
     {
 
@@ -20,7 +22,25 @@ public class DayNightCycler : MonoBehaviour
         rotationAxis = starsTransform.right;
         rotationAngleStep = 360f * starsRefreshRate / GameManager.instance.gameGlobalParameters.dayLengthInSeconds;
 
-        StartCoroutine("UpdateStars");
+        // (we add a little safety check so that if the script is
+        // enabled while the game is paused, the system doesn't
+        // yet start its coroutine)
+        if (!GameManager.instance.gameIsPaused)
+        {
+            starsCoroutine = StartCoroutine("UpdateStars");
+        }
+    }
+
+    private void OnEnable()
+    {
+        EventManager.AddListener("PauseGame", OnPauseGame);
+        EventManager.AddListener("ResumeGame", OnResumeGame);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.RemoveListener("PauseGame", OnPauseGame);
+        EventManager.RemoveListener("ResumeGame", OnResumeGame);
     }
 
     private IEnumerator UpdateStars()
@@ -44,6 +64,23 @@ public class DayNightCycler : MonoBehaviour
 
             yield return new WaitForSeconds(starsRefreshRate);
 
+        }
+    }
+
+    private void OnPauseGame()
+    {
+        if (starsCoroutine != null)
+        {
+            StopCoroutine(starsCoroutine);
+            starsCoroutine = null;
+        }
+    }
+
+    private void OnResumeGame()
+    {
+        if (starsCoroutine == null)
+        {
+            starsCoroutine = StartCoroutine("UpdateStars");
         }
     }
 }

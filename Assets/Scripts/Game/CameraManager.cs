@@ -41,6 +41,8 @@ public class CameraManager : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.instance.gameIsPaused) return;
+
         if (mouseOnScreenBorder >= 0)
         {
             TranslateCamera(mouseOnScreenBorder);

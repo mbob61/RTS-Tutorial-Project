@@ -35,6 +35,8 @@ public class UIManager : MonoBehaviour
     private Unit selectedUnit;
     [SerializeField] private GameObject unitSkillButtonPrefab;
 
+    [SerializeField] private GameObject gameSettingsPanel;
+
     private Dictionary<string, TextMeshProUGUI> resourceTextFields;
     private Dictionary<string, Button> buildingButtons;
 
@@ -101,6 +103,7 @@ public class UIManager : MonoBehaviour
 
         ShowSelectedUnitMenu(false);
 
+        gameSettingsPanel.SetActive(false);
     }
 
     private void OnEnable()
@@ -328,5 +331,12 @@ public class UIManager : MonoBehaviour
     private void AddUnitSKillButtonListener(Button b, int index)
     {
         b.onClick.AddListener(() => selectedUnit.TriggerSkill(index));
+    }
+
+    public void ToggleGameSettingsPanel()
+    {
+        bool showGameSettingsPanel = !gameSettingsPanel.activeSelf;
+        gameSettingsPanel.SetActive(showGameSettingsPanel);
+        EventManager.TriggerEvent(showGameSettingsPanel ? "PauseGame" : "ResumeGame");
     }
 }

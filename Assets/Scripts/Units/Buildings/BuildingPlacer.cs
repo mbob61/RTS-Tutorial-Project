@@ -14,19 +14,16 @@ public class BuildingPlacer : MonoBehaviour
 
     private void Start()
     {
-        // instantiate headquarters at the beginning of the game
-        buildingToPlace = new Building(GameManager.instance.gameGlobalParameters.initialBuilding);
-        buildingToPlace.SetPosition(GameManager.instance.startPosition);
-        // link the data into the manager
-        buildingToPlace.Transform.GetComponent<BuildingManager>().Initialize(buildingToPlace);
-        PlaceBuilding();
-        // make sure we have no building selected when the player starts
-        // to play
-        _CancelPlacedBuilding();
+        SpawnBuilding(
+            GameManager.instance.gameGlobalParameters.initialBuilding,
+            GameManager.instance.gamePlayerParameters.myPlayerId,
+            GameManager.instance.startPosition
+        );
     }
 
     private void Update()
     {
+        if (GameManager.instance.gameIsPaused) return;
         if (buildingToPlace != null)
         {
             if (Input.GetKeyDown(KeyCode.Q))
@@ -66,8 +63,10 @@ public class BuildingPlacer : MonoBehaviour
         {
             Destroy(buildingToPlace.Transform.gameObject);
         }
-        Building building = new Building(Globals.AVAILABLE_BUILDINGS_DATA[index]);
-        building.Transform.GetComponent<BuildingManager>().Initialize(building);
+        Building building = new Building(
+            Globals.AVAILABLE_BUILDINGS_DATA[index],
+            GameManager.instance.gamePlayerParameters.myPlayerId);
+
         buildingToPlace = building;
         lastPlacementPosition = Vector3.zero;
     }
@@ -80,7 +79,7 @@ public class BuildingPlacer : MonoBehaviour
         buildingToPlace = null;
     }
 
-    private void PlaceBuilding()
+    private void PlaceBuilding(bool canChain = true)
     {
         // Place the building
         buildingToPlace.Place();
@@ -89,8 +88,11 @@ public class BuildingPlacer : MonoBehaviour
         // If this is desired, comment out the below and uncomment the below block
         //buildingToPlace = null;
 
-        //Allow continous building if we have the resources for it
-        if (buildingToPlace.IsAffordable())
+        if (canChain)
+        {
+
+            //Allow continous building if we have the resources for it
+            if (buildingToPlace.IsAffordable())
             {
                 PrepareBuildingWithIndexForPlacement(buildingToPlace.DataIndex);
             }
@@ -98,10 +100,35 @@ public class BuildingPlacer : MonoBehaviour
             {
                 buildingToPlace = null;
             }
+        }
+            // Update the resources texts to reflect the purchase
+            EventManager.TriggerEvent("UpdateResourceText");
+            // Set the button interactivity based on the update resources
+            EventManager.TriggerEvent("SetBuildingButtonInteractivity");
+        
+    }
 
-        // Update the resources texts to reflect the purchase
-        EventManager.TriggerEvent("UpdateResourceText");
-        // Set the button interactivity based on the update resources
-        EventManager.TriggerEvent("SetBuildingButtonInteractivity");
+    public void SpawnBuilding(BuildingData data, int owner, Vector3 position)
+    {
+        SpawnBuilding(data, owner, position, new List<ResourceValue>() { });
+    }
+
+
+    public void SpawnBuilding(BuildingData data, int owner, Vector3 position, List<ResourceValue> resources)
+    {
+
+        Building previousBuilding = buildingToPlace;
+
+        // instantiate headquarters at the beginning of the game
+        buildingToPlace = new Building(
+            GameManager.instance.gameGlobalParameters.initialBuilding,
+            GameManager.instance.gamePlayerParameters.myPlayerId);
+
+        buildingToPlace.SetPosition(GameManager.instance.startPosition);
+        // link the data into the manager
+        PlaceBuilding(false);
+        // make sure we have no building selected when the player starts
+        // to play
+        buildingToPlace = previousBuilding;
     }
 }

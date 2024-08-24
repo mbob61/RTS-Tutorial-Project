@@ -18,8 +18,9 @@ MonoBehaviour:
   healthpoints: 50
   unitPrefab: {fileID: 2502313377195916727, guid: 59b47fc9938ae42eb96511e200850eba, type: 3}
   costs:
-  - code: gold
+  - code: 0
     amount: 10
   skills: []
+  canProduce: 00000000
   onSelectSound: {fileID: 8300000, guid: b2ec01e049eaa469a848e7e70578095b, type: 3}
   ambientSound: {fileID: 0}

@@ -17,13 +17,7 @@ public class BuildingPlacer : MonoBehaviour
         SpawnBuilding(
             GameManager.instance.gameGlobalParameters.initialBuilding,
             GameManager.instance.gamePlayerParameters.myPlayerId,
-            GameManager.instance.startPosition,
-            new List<ResourceValue>()
-            {
-                new ResourceValue("gold", 5),
-                new ResourceValue("wood", 3),
-                new ResourceValue("stone", 2),
-            }
+            GameManager.instance.startPosition
         );
     }
 
@@ -42,6 +36,8 @@ public class BuildingPlacer : MonoBehaviour
             if (Physics.Raycast(ray, out raycastHit, 1000f, terrainLayer))
             {
                 buildingToPlace.SetPosition(raycastHit.point);
+
+                EventManager.TriggerEvent("UpdatePlacedBuildingProduction", new object[] {buildingToPlace.ComputeProduction(), buildingToPlace.Transform.position });
                 if (lastPlacementPosition != raycastHit.point)
                 {
                     buildingToPlace.CheckAndSetPlacementStatus();
@@ -75,6 +71,8 @@ public class BuildingPlacer : MonoBehaviour
 
         buildingToPlace = building;
         lastPlacementPosition = Vector3.zero;
+        EventManager.TriggerEvent("PlaceBuildingOn");
+
     }
 
     private void _CancelPlacedBuilding()
@@ -83,11 +81,13 @@ public class BuildingPlacer : MonoBehaviour
         if (buildingToPlace == null) return;
         Destroy(buildingToPlace.Transform.gameObject);
         buildingToPlace = null;
+        EventManager.TriggerEvent("PlaceBuildingOff");
     }
 
     private void PlaceBuilding(bool canChain = true)
     {
         // Place the building
+        buildingToPlace.ComputeProduction();
         buildingToPlace.Place();
 
         // Do not allow subsquent builds without pressing the button again

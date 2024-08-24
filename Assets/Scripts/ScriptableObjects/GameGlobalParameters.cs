@@ -13,6 +13,27 @@ public class GameGlobalParameters : GameParameters
     [Header("Initialization")]
     public BuildingData initialBuilding;
 
+    [Header("Resource Production")]
+    public int baseGoldProduction;
+    public int bonusGoldProductionPerBuilding;
+    public float goldBonusRange;
+    public float woodProductionRange;
+    public float stoneProductionRange;
+
     public override string GetParametersName() => "Global";
+
+    public delegate int ResourceProductionFunction(float distance);
+
+    [HideInInspector]
+    public ResourceProductionFunction woodProductionFunction = (float distance) =>
+    {
+        return Mathf.CeilToInt(10 * 1f / distance);
+    };
+
+    [HideInInspector]
+    public ResourceProductionFunction stoneProductionFunction = (float distance) =>
+    {
+        return Mathf.CeilToInt(2 * 1f / distance);
+    };
 
 }

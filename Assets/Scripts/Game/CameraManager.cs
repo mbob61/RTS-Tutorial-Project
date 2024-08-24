@@ -29,6 +29,9 @@ public class CameraManager : MonoBehaviour
 
     [SerializeField] private Transform groundTarget;
 
+    public bool allowMouseMovement;
+    public bool allowKeyboardMovement;
+
     private void Awake()
     {
         _camera = GetComponent<Camera>();
@@ -43,27 +46,30 @@ public class CameraManager : MonoBehaviour
     {
         if (GameManager.instance.gameIsPaused) return;
 
-        if (mouseOnScreenBorder >= 0)
+        if (mouseOnScreenBorder >= 0 && allowMouseMovement)
         {
             TranslateCamera(mouseOnScreenBorder);
         }
         else
         {
-            if (Input.GetKey(KeyCode.UpArrow))
+            if (allowKeyboardMovement)
             {
-                TranslateCamera(0);
-            }
-            if (Input.GetKey(KeyCode.RightArrow))
-            {
-                TranslateCamera(1);
-            }
-            if (Input.GetKey(KeyCode.DownArrow))
-            {
-                TranslateCamera(2);
-            }
-            if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                TranslateCamera(3);
+                if (Input.GetKey(KeyCode.UpArrow))
+                {
+                    TranslateCamera(0);
+                }
+                if (Input.GetKey(KeyCode.RightArrow))
+                {
+                    TranslateCamera(1);
+                }
+                if (Input.GetKey(KeyCode.DownArrow))
+                {
+                    TranslateCamera(2);
+                }
+                if (Input.GetKey(KeyCode.LeftArrow))
+                {
+                    TranslateCamera(3);
+                }
             }
         }
 

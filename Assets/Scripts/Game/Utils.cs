@@ -125,7 +125,7 @@ public class Utils : MonoBehaviour
                 ray,
                 out hit,
                 1000f,
-                LayerMask.GetMask("Terrain")
+                Globals.TERRAIN_LAYER
             )) return hit.point;
         return Vector3.zero;
     }

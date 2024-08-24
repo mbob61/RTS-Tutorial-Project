@@ -16,11 +16,11 @@ public class DataHandler : MonoBehaviour
             parameters.LoadFromFile();
         }
 
-        ResourceData resources = Resources.Load<ResourceData>("ScriptableObjects/Resources") as ResourceData;
-        foreach (ResourceValue r in resources.initialResources)
-        {
-            Globals.AVAILABLE_RESOURCES.Add(r.code, new GameResource(r.code, r.amount));
-        }
+        //ResourceData resources = Resources.Load<ResourceData>("ScriptableObjects/Resources") as ResourceData;
+        //foreach (ResourceValue r in resources.initialResources)
+        //{
+        //    Globals.AVAILABLE_RESOURCES.Add(r.code, new GameResource(r.code, r.amount));
+        //}
 
         //// Load the resources
         //ResourceData resources = Resources.Load<ResourceData>("ScriptableObjects/Resources");

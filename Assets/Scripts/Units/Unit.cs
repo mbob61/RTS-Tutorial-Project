@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Unit {
 
@@ -9,9 +10,9 @@ public class Unit {
     protected int currentHealth;
     protected string uid;
     protected int level;
-    protected List<ResourceValue> production;
     protected List<SkillManager> skillManagers;
     protected int owner;
+    protected Dictionary<InGameResource, int> production;
 
     public Unit(UnitData data, int owner) : this(data, owner, new List<ResourceValue>() { }){}
     public Unit(UnitData data, int owner, List<ResourceValue> production)
@@ -26,7 +27,8 @@ public class Unit {
 
         this.uid = System.Guid.NewGuid().ToString();
         this.level = 1;
-        this.production = production;
+        this.production = production.ToDictionary(rv => rv.code, rv => rv.amount);
+
 
         skillManagers = new List<SkillManager>();
         SkillManager sm;
@@ -79,15 +81,61 @@ public class Unit {
 
     public void ProduceResources()
     {
-        foreach (ResourceValue resource in production)
+        foreach (KeyValuePair<InGameResource, int> resource in production)
         {
-            Globals.AVAILABLE_RESOURCES[resource.code].AddAmount(resource.amount);
+            Globals.AVAILABLE_RESOURCES[resource.Key].AddAmount(resource.Value);
         }
     }
 
     public void TriggerSkill(int index, GameObject target = null)
     {
         skillManagers[index].Trigger(target);
+    }
+
+    public Dictionary<InGameResource, int> ComputeProduction()
+    {
+        Debug.Log(data.producedResources.Length);
+        if (data.producedResources.Length == 0) return null;
+
+        GameGlobalParameters globalParameters = GameManager.instance.gameGlobalParameters;
+        GamePlayerParameters playerParameters = GameManager.instance.gamePlayerParameters;
+        Vector3 currentPosition = transform.position;
+
+
+        if (data.producedResources.Contains(InGameResource.Gold))
+        {
+            int bonusBuildingsCount =
+                Physics.OverlapSphere(currentPosition, globalParameters.goldBonusRange, Globals.UNIT_LAYER)
+                .Where(delegate (Collider c) {
+                    BuildingManager m = c.GetComponent<BuildingManager>();
+                    if (m == null) return false;
+                    return m.Unit.Owner == playerParameters.myPlayerId;
+                })
+                .Count();
+
+            production[InGameResource.Gold] = globalParameters.baseGoldProduction + bonusBuildingsCount * globalParameters.bonusGoldProductionPerBuilding;
+        }
+
+        if (data.producedResources.Contains(InGameResource.Wood))
+        {
+            int treesScore =
+                Physics.OverlapSphere(currentPosition, globalParameters.woodProductionRange, Globals.TREE_LAYER)
+                .Select((c) => globalParameters.woodProductionFunction(Vector3.Distance(currentPosition, c.transform.position)))
+                .Sum();
+            production[InGameResource.Wood] = treesScore;
+        }
+
+        if (data.producedResources.Contains(InGameResource.Stone))
+        {
+            int rocksScore =
+                Physics.OverlapSphere(currentPosition, globalParameters.woodProductionRange, Globals.ROCK_LAYER)
+                .Select((c) => globalParameters.stoneProductionFunction(Vector3.Distance(currentPosition, c.transform.position)))
+                .Sum();
+            production[InGameResource.Stone] = rocksScore;
+        }
+
+        return production;
+
     }
 
     public UnitData Data { get => data; }
@@ -97,7 +145,7 @@ public class Unit {
     public int MaxHP { get => data.healthpoints; }
     public string Uid { get => uid; }
     public int Level { get => level; }
-    public List<ResourceValue> Production { get => production; }
+    public Dictionary<InGameResource, int> Production { get => production; }
     public List<SkillManager> SkillManagers { get => skillManagers; }
     public int Owner { get => owner; }
 }

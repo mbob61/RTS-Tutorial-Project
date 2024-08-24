@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class UIManager : MonoBehaviour
 {
@@ -37,12 +38,19 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private GameObject gameSettingsPanel;
 
-    private Dictionary<string, TextMeshProUGUI> resourceTextFields;
+    private Dictionary<InGameResource, TextMeshProUGUI> resourceTextFields;
+
     private Dictionary<string, Button> buildingButtons;
 
     private TextMeshProUGUI infoPanelTitleText;
     private TextMeshProUGUI infoPanelDescriptionText;
     private Transform infoPanelResourcesParent;
+
+    [Header("Placed Building Production")]
+    public RectTransform placedBuildingProductionRectTransform;
+
+    public float rightAmount = 40f;
+    public float upAmount = 10f;
 
     private void Awake()
     {
@@ -78,13 +86,13 @@ public class UIManager : MonoBehaviour
         }
 
         // Resource information top bar
-        resourceTextFields = new Dictionary<string, TextMeshProUGUI>();
-        foreach (KeyValuePair<string, GameResource> pair in Globals.AVAILABLE_RESOURCES)
+        resourceTextFields = new Dictionary<InGameResource, TextMeshProUGUI>();
+        foreach (KeyValuePair<InGameResource, GameResource> pair in Globals.AVAILABLE_RESOURCES)
         {
             GameObject resourceDisplayObject = Instantiate(resourceDisplayPrefab, resourceParent);
-            resourceDisplayPrefab.name = pair.Key;
+            resourceDisplayPrefab.name = pair.Key.ToString();
             resourceTextFields[pair.Key] = resourceDisplayObject.transform.Find("Amount").GetComponent<TextMeshProUGUI>();
-            SetResourcesText(pair.Key, pair.Value);
+            SetResourcesText(pair.Key, pair.Value.CurrentAmount);
         }
 
         // hide all selection group buttons
@@ -104,6 +112,8 @@ public class UIManager : MonoBehaviour
         ShowSelectedUnitMenu(false);
 
         gameSettingsPanel.SetActive(false);
+        placedBuildingProductionRectTransform.gameObject.SetActive(false);
+
     }
 
     private void OnEnable()
@@ -114,6 +124,10 @@ public class UIManager : MonoBehaviour
         EventManager.AddListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
         EventManager.AddListener("SelectUnit", _OnSelectUnit);
         EventManager.AddListener("DeselectUnit", _OnDeselectUnit);
+
+        EventManager.AddListener("UpdatePlacedBuildingProduction", OnUpdatePlacedBuildingProduction);
+        EventManager.AddListener("PlaceBuildingOn", OnPlaceBuildingOn);
+        EventManager.AddListener("PlaceBuildingOff", OnPlaceBuildingOff);
     }
 
     private void OnDisable()
@@ -124,6 +138,50 @@ public class UIManager : MonoBehaviour
         EventManager.RemoveListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
         EventManager.RemoveListener("SelectUnit", _OnSelectUnit);
         EventManager.RemoveListener("DeselectUnit", _OnDeselectUnit);
+
+        EventManager.RemoveListener("UpdatePlacedBuildingProduction", OnUpdatePlacedBuildingProduction);
+        EventManager.RemoveListener("PlaceBuildingOn", OnPlaceBuildingOn);
+        EventManager.RemoveListener("PlaceBuildingOff", OnPlaceBuildingOff);
+    }
+
+    private void OnUpdatePlacedBuildingProduction(object data)
+    {
+        object[] values = (object[])data;
+        Dictionary<InGameResource, int> production = (Dictionary<InGameResource, int>)values[0];
+        Vector3 position = (Vector3)values[1];
+
+        // clear current list
+        foreach (Transform child in placedBuildingProductionRectTransform.gameObject.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // add one "resource cost" prefab per resource
+        GameObject g;
+        Transform t;
+        foreach (KeyValuePair<InGameResource, int> pair in production)
+        {
+            g = GameObject.Instantiate(gameResourceProductionPrefab, placedBuildingProductionRectTransform.transform);
+            t = g.transform;
+            t.Find("Text (TMP)").GetComponent<TextMeshProUGUI>().text = $"{pair.Key}: +{pair.Value}";
+        }
+
+        // resize container to fit the right number of lines
+        //placedBuildingProductionRectTransform.sizeDelta = new Vector2(80, 24 * production.Count);
+
+        // place container top-right of the "phantom" building
+        //placedBuildingProductionRectTransform.position = (Vector2)Camera.main.WorldToScreenPoint(position);
+        placedBuildingProductionRectTransform.position = (Vector2)Camera.main.WorldToScreenPoint(position) + Vector2.right * rightAmount + Vector2.up * upAmount;
+    }
+
+    private void OnPlaceBuildingOn()
+    {
+        placedBuildingProductionRectTransform.gameObject.SetActive(true);
+    }
+
+    private void OnPlaceBuildingOff()
+    {
+        placedBuildingProductionRectTransform.gameObject.SetActive(false);
     }
 
     private void AddBuildingButtonListener(Button button, int globalBuildingIndex)
@@ -131,16 +189,16 @@ public class UIManager : MonoBehaviour
         button.onClick.AddListener(() => buildingPlacer.SelectBuildingToPlace(globalBuildingIndex));
     }
 
-    private void SetResourcesText(string resourceName, GameResource value)
+    private void SetResourcesText(InGameResource resource, int value)
     {
-        resourceTextFields[resourceName].text = value.Name + "\n" +  value.CurrentAmount.ToString();
+        resourceTextFields[resource].text = resource.ToString() + "\n" + value.ToString();
     }
 
     public void OnUpdateResourcesTexts()
     {
-        foreach(KeyValuePair<string, GameResource> pair in Globals.AVAILABLE_RESOURCES)
+        foreach(KeyValuePair<InGameResource, GameResource> pair in Globals.AVAILABLE_RESOURCES)
         {
-            SetResourcesText(pair.Key, pair.Value);
+            SetResourcesText(pair.Key, pair.Value.CurrentAmount);
         }
     }
 
@@ -319,11 +377,11 @@ public class UIManager : MonoBehaviour
         if (unit.Production.Count > 0)
         {
             GameObject g; Transform t;
-            foreach (ResourceValue resource in unit.Production)
+            foreach (KeyValuePair<InGameResource, int> resource in unit.Production)
             {
                 g = GameObject.Instantiate(gameResourceProductionPrefab, selectedUnitResourcesProductionParent);
                 t = g.transform;
-                t.Find("Text").GetComponent<TextMeshProUGUI>().text = $"{resource.code}: +{resource.amount}";
+                t.Find("Text").GetComponent<TextMeshProUGUI>().text = $"{resource.Key}: +{resource.Value}";
             }
         }
     }

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5702819069312887543}
   - component: {fileID: 2286474150652613075}
   - component: {fileID: 157591968338739110}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,7 +112,7 @@ GameObject:
   - component: {fileID: 975417613293781826}
   - component: {fileID: 3062134942125912039}
   - component: {fileID: 4719541955323246105}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SelectionIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -220,7 +220,7 @@ GameObject:
   - component: {fileID: 2542972712281360877}
   - component: {fileID: 9213553437465765539}
   - component: {fileID: 986067530004872679}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: House
   m_TagString: Unit
   m_Icon: {fileID: 0}
@@ -258,6 +258,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectionIndicator: {fileID: 2190974820142115463}
   contextualSource: {fileID: 986067530004872679}
+  ownerMaterialSlotIndex: 0
   terrainLayer:
     serializedVersion: 2
     m_Bits: 64

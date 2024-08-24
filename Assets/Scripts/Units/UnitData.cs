@@ -11,6 +11,7 @@ public class UnitData : ScriptableObject
     public GameObject unitPrefab;
     public List<ResourceValue> costs;
     public List<SkillData> skills = new List<SkillData>();
+    public InGameResource[] producedResources;
 
     [Header("General Sounds")]
     public AudioClip onSelectSound;
@@ -32,10 +33,10 @@ public class UnitData : ScriptableObject
 [System.Serializable]
 public class ResourceValue
 {
-    public string code = "";
+    public InGameResource code;
     public int amount = 0;
 
-    public ResourceValue(string code, int amount)
+    public ResourceValue(InGameResource code, int amount)
     {
         this.code = code;
         this.amount = amount;

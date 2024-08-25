@@ -10,6 +10,8 @@ public class UnitManager : MonoBehaviour
     private GameObject healthBar;
     protected BoxCollider boxCollider;
     public virtual Unit Unit { get; set; }
+    private bool selected = false;
+    public bool IsSelected { get => selected; }
 
     public AudioSource contextualSource;
 
@@ -96,6 +98,7 @@ public class UnitManager : MonoBehaviour
 
         //play sound
         contextualSource.PlayOneShot(Unit.Data.onSelectSound);
+        selected = true;
     }
 
     public void DeselectUnit()
@@ -110,6 +113,7 @@ public class UnitManager : MonoBehaviour
         healthBar = null;
         EventManager.TriggerEvent("DeselectUnit", Unit);
 
+        selected = false;
     }
 
     protected virtual bool IsReadyForSelection()

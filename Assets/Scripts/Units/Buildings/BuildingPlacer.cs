@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -108,7 +108,7 @@ public class BuildingPlacer : MonoBehaviour
             }
         }
             // Update the resources texts to reflect the purchase
-            EventManager.TriggerEvent("UpdateResourceText");
+            EventManager.TriggerEvent("UpdateResourceTexts");
             // Set the button interactivity based on the update resources
             EventManager.TriggerEvent("SetBuildingButtonInteractivity");
         

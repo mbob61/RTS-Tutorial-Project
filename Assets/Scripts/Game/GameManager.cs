@@ -16,9 +16,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public bool gameIsPaused;
     public GamePlayerParameters gamePlayerParameters;
 
-    [HideInInspector] public List<Unit> ownedResourceProducingUnits = new List<Unit>();
-    private float resourceProductionRate = 1f;
-    private Coroutine resourceProductionCoroutine = null;
+    public float resourceProductionRate = 1f;
 
     private void Awake()
     {
@@ -34,32 +32,11 @@ public class GameManager : MonoBehaviour
     public void Start()
     {
         instance = this;
-
-        resourceProductionCoroutine = StartCoroutine("ProduceResources");
     }
 
     void Update()
     {
         if (gameIsPaused) return;
-        CheckUnitNavigation();
-    }
-
-    private void CheckUnitNavigation()
-    {
-        if (Globals.CURRENTLY_SELECTED_UNITS.Count > 0 && Input.GetMouseButtonUp(1))
-        {
-            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out raycastHit, 1000f, terrainLayer))
-            {
-                foreach (UnitManager unit in Globals.CURRENTLY_SELECTED_UNITS)
-                {
-                    if (unit.GetType() == typeof(CharacterManager))
-                    {
-                        ((CharacterManager)unit).MoveTo(raycastHit.point);
-                    }
-                }
-            }
-        }
     }
 
     private void OnEnable()
@@ -77,33 +54,13 @@ public class GameManager : MonoBehaviour
     private void OnPauseGame()
     {
         gameIsPaused = true;
-        if (resourceProductionCoroutine != null)
-        {
-            StopCoroutine(resourceProductionCoroutine);
-            resourceProductionCoroutine = null;
-        }
+       
     }
 
     private void OnResumeGame()
     {
         gameIsPaused = false;
-        if (resourceProductionCoroutine == null)
-        {
-            resourceProductionCoroutine = StartCoroutine("ProduceResources");
-        }
-    }
-
-    private IEnumerator ProduceResources()
-    {
-        while (true)
-        {
-            foreach(Unit unit in ownedResourceProducingUnits)
-            {
-                unit.ProduceResources();
-            }
-            EventManager.TriggerEvent("UpdateResourceText");
-            yield return new WaitForSeconds(resourceProductionRate);
-        }
+        
     }
 
     private void OnApplicationQuit()

@@ -118,7 +118,7 @@ public class UIManager : MonoBehaviour
 
     private void OnEnable()
     {
-        EventManager.AddListener("UpdateResourceText", OnUpdateResourcesTexts);
+        EventManager.AddListener("UpdateResourceTexts", OnUpdateResourcesTexts);
         EventManager.AddListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
         EventManager.AddListener("HoverBuildingButton", OnHoverBuildingButton);
         EventManager.AddListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
@@ -132,7 +132,7 @@ public class UIManager : MonoBehaviour
 
     private void OnDisable()
     {
-        EventManager.RemoveListener("UpdateResourceText", OnUpdateResourcesTexts);
+        EventManager.RemoveListener("UpdateResourceTexts", OnUpdateResourcesTexts);
         EventManager.RemoveListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
         EventManager.RemoveListener("HoverBuildingButton", OnHoverBuildingButton);
         EventManager.RemoveListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
@@ -191,7 +191,7 @@ public class UIManager : MonoBehaviour
 
     private void SetResourcesText(InGameResource resource, int value)
     {
-        resourceTextFields[resource].text = resource.ToString() + "\n" + value.ToString();
+        resourceTextFields[resource].text = resource.ToString() + ": " + value.ToString();
     }
 
     public void OnUpdateResourcesTexts()
@@ -381,7 +381,7 @@ public class UIManager : MonoBehaviour
             {
                 g = GameObject.Instantiate(gameResourceProductionPrefab, selectedUnitResourcesProductionParent);
                 t = g.transform;
-                t.Find("Text").GetComponent<TextMeshProUGUI>().text = $"{resource.Key}: +{resource.Value}";
+                t.Find("Text (TMP)").GetComponent<TextMeshProUGUI>().text = $"{resource.Key}: +{resource.Value}";
             }
         }
     }

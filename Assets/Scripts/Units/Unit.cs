@@ -61,11 +61,6 @@ public class Unit {
             }
 
             EventManager.TriggerEvent("PlaySoundByName", "buildingCompleted");
-
-            if (production.Count > 0)
-            {
-                GameManager.instance.ownedResourceProducingUnits.Add(this);
-            }
         }
     }
 
@@ -94,7 +89,6 @@ public class Unit {
 
     public Dictionary<InGameResource, int> ComputeProduction()
     {
-        Debug.Log(data.producedResources.Length);
         if (data.producedResources.Length == 0) return null;
 
         GameGlobalParameters globalParameters = GameManager.instance.gameGlobalParameters;

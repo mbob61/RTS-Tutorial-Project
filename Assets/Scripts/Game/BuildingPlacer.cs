@@ -19,6 +19,11 @@ public class BuildingPlacer : MonoBehaviour
             GameManager.instance.gamePlayerParameters.myPlayerId,
             GameManager.instance.startPosition
         );
+
+        SpawnBuilding(
+            GameManager.instance.gameGlobalParameters.initialBuilding,
+            GameManager.instance.gamePlayerParameters.myPlayerId + 1,
+            GameManager.instance.startPosition + new Vector3(-15, 0f, 0f));
     }
 
     private void Update()
@@ -124,11 +129,11 @@ public class BuildingPlacer : MonoBehaviour
     {
 
         Building previousBuilding = buildingToPlace;
+        
 
         // instantiate headquarters at the beginning of the game
         buildingToPlace = new Building(data, owner, resources);
-
-        buildingToPlace.SetPosition(GameManager.instance.startPosition);
+        buildingToPlace.SetPosition(position);
         // link the data into the manager
         PlaceBuilding(false);
         // make sure we have no building selected when the player starts

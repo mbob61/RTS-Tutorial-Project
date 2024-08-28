@@ -7621,6 +7621,8 @@ MonoBehaviour:
   placedBuildingProductionRectTransform: {fileID: 774744883}
   rightAmount: 60
   upAmount: 10
+  selectedUnitMenuUpgradeButton: {fileID: 3276391354211688643}
+  selectedUnitMenuDestroyButton: {fileID: 344101633}
 --- !u!114 &2124038019
 MonoBehaviour:
   m_ObjectHideFlags: 0

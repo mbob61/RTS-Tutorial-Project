@@ -23,6 +23,11 @@ public class UnitManager : MonoBehaviour
         Unit = unit;
     }
 
+    private void Update()
+    {
+        print(Unit.CurrentHP);
+    }
+
     private void Awake()
     {
         canvasTransform = GameObject.Find("Canvas").transform;
@@ -30,7 +35,12 @@ public class UnitManager : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (IsReadyForSelection() && IsMyUnit())
+        //if (IsReadyForSelection() && IsMyUnit())
+        //{
+        //    SelectUnit(true, Input.GetKey(KeyCode.LeftShift));
+        //}
+
+        if (IsReadyForSelection())
         {
             SelectUnit(true, Input.GetKey(KeyCode.LeftShift));
         }
@@ -132,5 +142,35 @@ public class UnitManager : MonoBehaviour
         Material[] materials = transform.Find("Mesh").GetComponent<Renderer>().materials;
         materials[ownerMaterialSlotIndex].color = playerColor;
         transform.Find("Mesh").GetComponent<Renderer>().materials = materials;
+    }
+
+    public void Attack(Transform target)
+    {
+        UnitManager um = target.GetComponent<UnitManager>();
+        if (um == null) return;
+        um.TakeDamage(Unit.Data.attackDamage);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        Unit.CurrentHP -= damage;
+        UpdateHealthBar();
+        if (Unit.CurrentHP <= 0) Die();
+    }
+
+    public void Die()
+    {
+        if (selected)
+        {
+            DeselectUnit();
+        }
+        Destroy(gameObject);
+    }
+
+    private void UpdateHealthBar()
+    {
+        if (!healthBar) return;
+        Transform fill = healthBar.transform.Find("Bar");
+        fill.GetComponent<UnityEngine.UI.Image>().fillAmount = Unit.CurrentHP / (float)Unit.MaxHP;
     }
 }

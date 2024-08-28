@@ -40,7 +40,6 @@ public class SkillData : ScriptableObject
 
                     UnitManager sourceUnitManager = source.GetComponent<UnitManager>();
                     if (sourceUnitManager == null) return;
-
                     Character character = new Character(data, sourceUnitManager.Unit.Owner);
                     character.ComputeProduction();
                     //character.Transform.position = instantiationPosition;

@@ -52,6 +52,10 @@ public class UIManager : MonoBehaviour
     public float rightAmount = 40f;
     public float upAmount = 10f;
 
+    [Header("Units Selection")]
+    public GameObject selectedUnitMenuUpgradeButton;
+    public GameObject selectedUnitMenuDestroyButton;
+
     private void Awake()
     {
         buildingPlacer = GetComponent<BuildingPlacer>();
@@ -288,7 +292,7 @@ public class UIManager : MonoBehaviour
                 b = gm.GetComponent<Button>();
                 unit.SkillManagers[i].SetButton(b);
                 t.Find("Title").GetComponent<TextMeshProUGUI>().text = unit.SkillManagers[i].skill.skillName;
-                AddUnitSKillButtonListener(b, i);
+                AddUnitSkillButtonListener(b, i);
             }
         }
     }
@@ -361,32 +365,83 @@ public class UIManager : MonoBehaviour
         infoPanelParent.SetActive(show);
     }
 
+    //private void SetSelectedUnitMenu(Unit unit)
+    //{
+    //    // adapt content panel heights to match info to display
+    //    int contentHeight = 60 + unit.Production.Count * 16;
+    //    selectedUnitContentRectTransform.sizeDelta = new Vector2(64, contentHeight);
+    //    selectedUnitButtonsRectTransform.anchoredPosition = new Vector2(0, -contentHeight - 20);
+    //    selectedUnitButtonsRectTransform.sizeDelta = new Vector2(70, Screen.height - contentHeight - 20);
+    //    // update texts
+    //    selectedUnitTitleText.text = unit.Data.unitName;
+    //    selectedUnitLevelText.text = $"Level {unit.Level}";
+    //    // clear resource production and reinstantiate new one
+    //    foreach (Transform child in selectedUnitResourcesProductionParent)
+    //        Destroy(child.gameObject);
+    //    if (unit.Production.Count > 0)
+    //    {
+    //        GameObject g; Transform t;
+    //        foreach (KeyValuePair<InGameResource, int> resource in unit.Production)
+    //        {
+    //            g = GameObject.Instantiate(gameResourceProductionPrefab, selectedUnitResourcesProductionParent);
+    //            t = g.transform;
+    //            t.Find("Text (TMP)").GetComponent<TextMeshProUGUI>().text = $"{resource.Key}: +{resource.Value}";
+    //        }
+    //    }
+    //}
+
     private void SetSelectedUnitMenu(Unit unit)
     {
+        selectedUnit = unit;
+
+        bool unitIsMine = unit.Owner == GameManager.instance.gamePlayerParameters.myPlayerId;
+
         // adapt content panel heights to match info to display
-        int contentHeight = 60 + unit.Production.Count * 16;
+        int contentHeight = unitIsMine ? 60 + unit.Production.Count * 16 : 60;
         selectedUnitContentRectTransform.sizeDelta = new Vector2(64, contentHeight);
         selectedUnitButtonsRectTransform.anchoredPosition = new Vector2(0, -contentHeight - 20);
         selectedUnitButtonsRectTransform.sizeDelta = new Vector2(70, Screen.height - contentHeight - 20);
         // update texts
         selectedUnitTitleText.text = unit.Data.unitName;
         selectedUnitLevelText.text = $"Level {unit.Level}";
-        // clear resource production and reinstantiate new one
+        // clear resource production
         foreach (Transform child in selectedUnitResourcesProductionParent)
             Destroy(child.gameObject);
-        if (unit.Production.Count > 0)
+        // reinstantiate new ones (if I own the unit)
+        if (unitIsMine && unit.Production.Count > 0)
         {
             GameObject g; Transform t;
             foreach (KeyValuePair<InGameResource, int> resource in unit.Production)
             {
-                g = GameObject.Instantiate(gameResourceProductionPrefab, selectedUnitResourcesProductionParent);
+                g = GameObject.Instantiate( gameResourceProductionPrefab, selectedUnitResourcesProductionParent);
                 t = g.transform;
                 t.Find("Text (TMP)").GetComponent<TextMeshProUGUI>().text = $"{resource.Key}: +{resource.Value}";
             }
         }
+        // clear skills
+        foreach (Transform child in selectedUnitActionButtonsParent)
+            Destroy(child.gameObject);
+        // reinstantiate new ones (if I own the unit)
+        if (unitIsMine && unit.SkillManagers.Count > 0)
+        {
+            GameObject g; Transform t; Button b;
+            for (int i = 0; i < unit.SkillManagers.Count; i++)
+            {
+                g = GameObject.Instantiate( unitSkillButtonPrefab, selectedUnitActionButtonsParent);
+                t = g.transform;
+                b = g.GetComponent<Button>();
+                unit.SkillManagers[i].SetButton(b);
+                t.Find("Title").GetComponent<TextMeshProUGUI>().text = unit.SkillManagers[i].skill.skillName;
+                AddUnitSkillButtonListener(b, i);
+            }
+        }
+
+        // hide upgrade/destroy buttons if I don't own the building
+        selectedUnitMenuUpgradeButton.SetActive(unitIsMine);
+        selectedUnitMenuDestroyButton.SetActive(unitIsMine);
     }
 
-    private void AddUnitSKillButtonListener(Button b, int index)
+    private void AddUnitSkillButtonListener(Button b, int index)
     {
         b.onClick.AddListener(() => selectedUnit.TriggerSkill(index));
     }

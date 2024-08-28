@@ -16,6 +16,12 @@ public class UnitData : ScriptableObject
     [Header("General Sounds")]
     public AudioClip onSelectSound;
 
+    [Header("Attack")]
+    public float attackRange;
+    public int attackDamage;
+    public float attackRate;
+    public float fieldOfViewRange;
+
     public bool IsAffordable()
     {
         foreach (ResourceValue cost in costs)

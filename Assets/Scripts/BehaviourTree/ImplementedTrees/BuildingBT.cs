@@ -17,8 +17,26 @@ public class BuildingBT : BTree
     {
         Node root;
 
-        // build the tree
-        root =
+        root = new Parallel();
+
+        if (buildingManager.Unit.Data.attackDamage > 0)
+        {
+            Sequence attackSequence = new Sequence(
+                new List<Node>
+                {
+                    new CheckEnemyInAttackRange(buildingManager),
+                    new Timer(buildingManager.Unit.Data.attackRate, new List<Node>
+                    {
+                        new TaskAttack(buildingManager)
+                    })
+                });
+
+            root.Attach(attackSequence);
+            root.Attach(new CheckEnemyInFOVRange(buildingManager));
+
+        }
+
+        Sequence resourceProductionSequence =
             new Sequence(new List<Node> {
                 new CheckUnitIsMine(buildingManager),
                 new Timer(
@@ -33,6 +51,9 @@ public class BuildingBT : BTree
                     }
                 )
             });
+
+        // build the tree
+        root.Attach(resourceProductionSequence);
 
         return root;
     }

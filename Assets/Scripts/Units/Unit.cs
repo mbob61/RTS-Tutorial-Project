@@ -135,7 +135,7 @@ public class Unit {
     public UnitData Data { get => data; }
     public string Code { get => data.code; }
     public Transform Transform { get => transform; }
-    public int HP { get => currentHealth; set => currentHealth = value; }
+    public int CurrentHP { get => currentHealth; set => currentHealth = value; }
     public int MaxHP { get => data.healthpoints; }
     public string Uid { get => uid; }
     public int Level { get => level; }

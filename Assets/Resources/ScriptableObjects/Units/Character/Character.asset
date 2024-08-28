@@ -18,9 +18,14 @@ MonoBehaviour:
   healthpoints: 10
   unitPrefab: {fileID: 2502313377195916727, guid: e2df0a915ab8b43f4ae96d00e5d695db, type: 3}
   costs:
-  - code: wood
+  - code: 0
     amount: 10
   skills: []
+  producedResources: 
   onSelectSound: {fileID: 8300000, guid: b2ec01e049eaa469a848e7e70578095b, type: 3}
+  attackRange: 3
+  attackDamage: 1
+  attackRate: 0.2
+  fieldOfViewRange: 12
   onMoveValidSound: {fileID: 8300000, guid: fc368c3517fcc451787d10385f0b991b, type: 3}
   onMoveInvalidSound: {fileID: 8300000, guid: 1ff665c23a1564caf9cee11c287679a5, type: 3}

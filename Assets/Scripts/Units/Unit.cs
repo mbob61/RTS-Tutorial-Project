@@ -14,6 +14,10 @@ public class Unit {
     protected int owner;
     protected Dictionary<InGameResource, int> production;
 
+    protected int attackDamage;
+    protected float attackRange;
+    protected bool levelMaxedOut;
+
     public Unit(UnitData data, int owner) : this(data, owner, new List<ResourceValue>() { }){}
     public Unit(UnitData data, int owner, List<ResourceValue> production)
     {
@@ -40,6 +44,10 @@ public class Unit {
         }
 
         transform.GetComponent<UnitManager>().Initialize(this);
+
+        attackDamage = data.attackDamage;
+        attackRange = data.attackRange;
+        levelMaxedOut = false;
     }
 
     public void SetPosition(Vector3 position)
@@ -71,7 +79,47 @@ public class Unit {
 
     public void LevelUp()
     {
+        if (levelMaxedOut) return;
         level++;
+
+        GameGlobalParameters p = GameManager.instance.gameGlobalParameters;
+
+        // check if reached max level
+        levelMaxedOut = level == p.UnitMaxLevel();
+
+        // update production
+        float resourceProductionMultiplier = 1.3f;
+        List<InGameResource> producedResources = production.Keys.ToList();
+
+        foreach (InGameResource r in producedResources)
+        {
+            int amount = Mathf.RoundToInt(production[r] * resourceProductionMultiplier);
+            production[r] = amount;
+        }
+
+        // update attack
+        float attackDamageMultiplier = 1.1f;
+        attackDamage = Mathf.CeilToInt(attackDamage * attackDamageMultiplier);
+
+        float attackRangeMultiplier = 1.2f;
+        attackRange *= attackRangeMultiplier;
+
+        // consume resources
+        foreach(ResourceValue resource in GetLevelUpCost())
+        {
+            Globals.AVAILABLE_RESOURCES[resource.code].AddAmount(-resource.amount);
+        }
+        EventManager.TriggerEvent("UpdateResourceTexts");
+
+        // play sound / show nice VFX
+
+        Debug.Log($"Level up to level {level}!");
+    }
+
+    public List<ResourceValue> GetLevelUpCost()
+    {
+        int xpCost = level + 2;
+        return Globals.ConvertXPCostToGameResources(xpCost, data.costs.Select(v => v.code));
     }
 
     public void ProduceResources()
@@ -142,4 +190,7 @@ public class Unit {
     public Dictionary<InGameResource, int> Production { get => production; }
     public List<SkillManager> SkillManagers { get => skillManagers; }
     public int Owner { get => owner; }
+    public int AttackDamage { get => attackDamage; }
+    public float AttackRange { get => attackRange; }
+    public bool LevelMaxedOut { get => levelMaxedOut; }
 }

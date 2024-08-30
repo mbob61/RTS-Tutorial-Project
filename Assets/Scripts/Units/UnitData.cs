@@ -24,14 +24,7 @@ public class UnitData : ScriptableObject
 
     public bool IsAffordable()
     {
-        foreach (ResourceValue cost in costs)
-        {
-            if (Globals.AVAILABLE_RESOURCES[cost.code].CurrentAmount < cost.amount)
-            {
-                return false;
-            }
-        }
-        return true;
+        return Globals.CanBuy(costs);
     }
 }
 

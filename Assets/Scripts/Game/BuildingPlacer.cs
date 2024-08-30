@@ -110,6 +110,7 @@ public class BuildingPlacer : MonoBehaviour
             else
             {
                 buildingToPlace = null;
+                EventManager.TriggerEvent("PlaceBuildingOff");
             }
         }
             // Update the resources texts to reflect the purchase

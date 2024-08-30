@@ -25,7 +25,16 @@ public class UnitManager : MonoBehaviour
 
     private void Update()
     {
-        print(Unit.CurrentHP);
+        if (selected && Input.GetKeyDown(KeyCode.L))
+        {
+            if (Globals.CanBuy(Unit.GetLevelUpCost()))
+            {
+                Unit.LevelUp();
+            } else
+            {
+                Debug.LogError("Can't buy the upgrade!");
+            }
+        }
     }
 
     private void Awake()
@@ -148,7 +157,7 @@ public class UnitManager : MonoBehaviour
     {
         UnitManager um = target.GetComponent<UnitManager>();
         if (um == null) return;
-        um.TakeDamage(Unit.Data.attackDamage);
+        um.TakeDamage(Unit.AttackDamage);
     }
 
     public void TakeDamage(int damage)

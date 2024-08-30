@@ -11,7 +11,7 @@ public class CheckEnemyInAttackRange : Node
     public CheckEnemyInAttackRange(UnitManager unitManager)
     {
         this.manager = unitManager;
-        this.attackRange = manager.Unit.Data.attackRange;
+        this.attackRange = manager.Unit.AttackRange;
     }
 
     public override NodeState Evaluate()

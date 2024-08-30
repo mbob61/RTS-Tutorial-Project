@@ -48,6 +48,7 @@ public class BuildingBT : BTree
                     delegate
                     {
                         EventManager.TriggerEvent("UpdateResourceTexts");
+                        EventManager.TriggerEvent("SetBuildingButtonInteractivity");
                     }
                 )
             });

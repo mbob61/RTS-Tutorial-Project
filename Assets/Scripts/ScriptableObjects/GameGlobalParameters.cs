@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 [CreateAssetMenu(fileName = "Global Parameters", menuName = "Scriptable Objects/Game Global Parameters", order = 10)]
 public class GameGlobalParameters : GameParameters
@@ -20,6 +21,11 @@ public class GameGlobalParameters : GameParameters
     public float woodProductionRange;
     public float stoneProductionRange;
 
+    public AnimationCurve experienceEvolutionCurve;
+    public AnimationCurve productionMultiplierCurve;
+    public AnimationCurve attackDamageMultiplierCurve;
+    public AnimationCurve attackRangeMultiplierCurve;
+
     public override string GetParametersName() => "Global";
 
     public delegate int ResourceProductionFunction(float distance);
@@ -38,7 +44,8 @@ public class GameGlobalParameters : GameParameters
 
     public int UnitMaxLevel()
     {
-        return 4;
+        Keyframe[] keys = experienceEvolutionCurve.keys;
+        return (int)keys.Select(k => k.time).Max();
     }
 
 }

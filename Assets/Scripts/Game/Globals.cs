@@ -45,7 +45,6 @@ public class Globals {
             .OrderBy(r => XP_CONVERSION_TO_RESOURCE[r])
             .ToList();
         int numberOfCostResources = sortedResources.Count();
-        Debug.Log("number: " + numberOfCostResources);
 
         Dictionary<InGameResource, int> xpCostToResources = new Dictionary<InGameResource, int>();
         foreach(InGameResource r in sortedResources)

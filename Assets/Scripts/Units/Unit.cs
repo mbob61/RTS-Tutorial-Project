@@ -3,6 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+public struct UnitLevelUpData
+{
+    public List<ResourceValue> levelUpCost;
+    public Dictionary<InGameResource, int> updatedResourceProduction;
+    public int newAttackDamage;
+    public float newAttackRange;
+
+    public UnitLevelUpData(List<ResourceValue> cost,  Dictionary<InGameResource, int> newProduction, int newAttackDamage, float newAttackRange)
+    {
+        this.levelUpCost = cost;
+        this.updatedResourceProduction = newProduction;
+        this.newAttackDamage = newAttackDamage;
+        this.newAttackRange = newAttackRange;
+    }
+}
+
 public class Unit {
 
     protected UnitData data;
@@ -17,6 +33,8 @@ public class Unit {
     protected int attackDamage;
     protected float attackRange;
     protected bool levelMaxedOut;
+
+    protected UnitLevelUpData levelUpData;
 
     public Unit(UnitData data, int owner) : this(data, owner, new List<ResourceValue>() { }){}
     public Unit(UnitData data, int owner, List<ResourceValue> production)
@@ -48,6 +66,7 @@ public class Unit {
         attackDamage = data.attackDamage;
         attackRange = data.attackRange;
         levelMaxedOut = false;
+        levelUpData = GetLevelUpData();
     }
 
     public void SetPosition(Vector3 position)
@@ -84,25 +103,10 @@ public class Unit {
 
         GameGlobalParameters p = GameManager.instance.gameGlobalParameters;
 
-        // check if reached max level
-        levelMaxedOut = level == p.UnitMaxLevel();
+        production = levelUpData.updatedResourceProduction;
 
-        // update production
-        float resourceProductionMultiplier = 1.3f;
-        List<InGameResource> producedResources = production.Keys.ToList();
-
-        foreach (InGameResource r in producedResources)
-        {
-            int amount = Mathf.RoundToInt(production[r] * resourceProductionMultiplier);
-            production[r] = amount;
-        }
-
-        // update attack
-        float attackDamageMultiplier = 1.1f;
-        attackDamage = Mathf.CeilToInt(attackDamage * attackDamageMultiplier);
-
-        float attackRangeMultiplier = 1.2f;
-        attackRange *= attackRangeMultiplier;
+        attackDamage = levelUpData.newAttackDamage;
+        attackRange = levelUpData.newAttackRange;
 
         // consume resources
         foreach(ResourceValue resource in GetLevelUpCost())
@@ -113,13 +117,20 @@ public class Unit {
 
         // play sound / show nice VFX
 
+        // check if reached max level
+        levelMaxedOut = level == p.UnitMaxLevel();
+
+        // prepare data for upgrade to next level
+        levelUpData = GetLevelUpData();
+
         Debug.Log($"Level up to level {level}!");
     }
 
     public List<ResourceValue> GetLevelUpCost()
     {
         int xpCost = level + 2;
-        return Globals.ConvertXPCostToGameResources(xpCost, data.costs.Select(v => v.code));
+        //int xpCost = (int)GameManager.instance.gameGlobalParameters.experienceEvolutionCurve.Evaluate(level + 2);
+        return Globals.ConvertXPCostToGameResources(xpCost, Data.costs.Select(v => v.code));
     }
 
     public void ProduceResources()
@@ -176,7 +187,35 @@ public class Unit {
             production[InGameResource.Stone] = rocksScore;
         }
 
+        levelUpData = GetLevelUpData();
+
         return production;
+
+    }
+
+    public UnitLevelUpData GetLevelUpData()
+    {
+        GameGlobalParameters p = GameManager.instance.gameGlobalParameters;
+
+        // update production: multiply production of each game resource
+        // by the multiplier defined in the game global parameters
+        float resourceProductionMultiplier = p.productionMultiplierCurve.Evaluate(level + 1);
+        List<InGameResource> producedResources = production.Keys.ToList();
+        Dictionary<InGameResource, int> newProduction = new Dictionary<InGameResource, int>(production.Count);
+
+        foreach (InGameResource r in producedResources)
+        {
+            int amount = Mathf.RoundToInt(production[r] * resourceProductionMultiplier);
+            newProduction[r] = amount;
+        }
+
+        // get updated attack parameters
+        float attDamageMultiplier = p.attackDamageMultiplierCurve.Evaluate(level + 1);
+        int newAttackDamage = Mathf.CeilToInt(attackDamage * attDamageMultiplier);
+        float attRangeMultiplier = p.attackRangeMultiplierCurve.Evaluate(level + 1);
+        float newAttackRange = attackRange * attRangeMultiplier;
+
+        return new UnitLevelUpData(GetLevelUpCost(), newProduction, newAttackDamage, newAttackRange);
 
     }
 
@@ -193,4 +232,5 @@ public class Unit {
     public int AttackDamage { get => attackDamage; }
     public float AttackRange { get => attackRange; }
     public bool LevelMaxedOut { get => levelMaxedOut; }
+    public UnitLevelUpData LevelUpData { get => levelUpData; }
 }

@@ -12,6 +12,16 @@ public class BuildingPlacer : MonoBehaviour
     private Vector3 lastPlacementPosition;
     [SerializeField] private LayerMask terrainLayer;
 
+    private void OnEnable()
+    {
+        EventManager.AddListener("<Input>Build", OnBuildInput);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.RemoveListener("<Input>Build", OnBuildInput);
+    }
+
     private void Start()
     {
         SpawnBuilding(
@@ -140,5 +150,20 @@ public class BuildingPlacer : MonoBehaviour
         // make sure we have no building selected when the player starts
         // to play
         buildingToPlace = previousBuilding;
+    }
+
+    private void OnBuildInput(object data)
+    {
+        string code = (string)data;
+        for (int i = 0; i < Globals.AVAILABLE_BUILDINGS_DATA.Length; i++)
+        {
+            if (Globals.AVAILABLE_BUILDINGS_DATA[i].code == code)
+            {
+                SelectBuildingToPlace(i);
+                return;
+            }
+        }
+
+        // get building code and select it for placement
     }
 }

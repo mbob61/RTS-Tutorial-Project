@@ -5,6 +5,9 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public GameGlobalParameters gameGlobalParameters;
+    public GamePlayerParameters gamePlayerParameters;
+    public GameInputParameters gameInputParameters;
+
     [SerializeField] private LayerMask terrainLayer;
 
     private Ray ray;
@@ -14,7 +17,6 @@ public class GameManager : MonoBehaviour
     public Vector3 startPosition;
 
     [HideInInspector] public bool gameIsPaused;
-    public GamePlayerParameters gamePlayerParameters;
 
     public float resourceProductionRate = 1f;
 
@@ -37,6 +39,10 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         if (gameIsPaused) return;
+        if (Input.anyKeyDown)
+        {
+            gameInputParameters.CheckForInput();
+        }
     }
 
     private void OnEnable()

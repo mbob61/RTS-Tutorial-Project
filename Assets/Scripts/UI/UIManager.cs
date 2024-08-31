@@ -56,6 +56,13 @@ public class UIManager : MonoBehaviour
     public GameObject selectedUnitMenuUpgradeButton;
     public GameObject selectedUnitMenuDestroyButton;
 
+    public GameObject gameSettingsMenuButtonPrefab;
+    public Transform gameSettingsMenusParent;
+    public Transform gameSettingsContentParent;
+
+    private Dictionary<string, GameParameters> gameParameters;
+
+
     private void Awake()
     {
         buildingPlacer = GetComponent<BuildingPlacer>();

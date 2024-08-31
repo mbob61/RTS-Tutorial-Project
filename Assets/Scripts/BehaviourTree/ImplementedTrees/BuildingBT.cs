@@ -38,7 +38,7 @@ public class BuildingBT : BTree
 
         Sequence resourceProductionSequence =
             new Sequence(new List<Node> {
-                new CheckUnitIsMine(buildingManager),
+                //new CheckUnitIsMine(buildingManager),
                 new Timer(
                     GameManager.instance.resourceProductionRate,
                     new List<Node>()

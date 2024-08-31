@@ -84,7 +84,7 @@ public class Unit {
             // Update the players resources by deducting the cost of the building
             foreach (ResourceValue value in data.costs)
             {
-                Globals.AVAILABLE_RESOURCES[value.code].AddAmount(-value.amount);
+                Globals.AVAILABLE_RESOURCES[owner][value.code].AddAmount(-value.amount);
             }
 
             EventManager.TriggerEvent("PlaySoundByName", "buildingCompleted");
@@ -93,7 +93,7 @@ public class Unit {
 
     public bool IsAffordable()
     {
-        return data.IsAffordable();
+        return data.IsAffordable(owner);
     }
 
     public void LevelUp()
@@ -111,7 +111,7 @@ public class Unit {
         // consume resources
         foreach(ResourceValue resource in GetLevelUpCost())
         {
-            Globals.AVAILABLE_RESOURCES[resource.code].AddAmount(-resource.amount);
+            Globals.AVAILABLE_RESOURCES[owner][resource.code].AddAmount(-resource.amount);
         }
         EventManager.TriggerEvent("UpdateResourceTexts");
 
@@ -137,7 +137,7 @@ public class Unit {
     {
         foreach (KeyValuePair<InGameResource, int> resource in production)
         {
-            Globals.AVAILABLE_RESOURCES[resource.Key].AddAmount(resource.Value);
+            Globals.AVAILABLE_RESOURCES[owner][resource.Key].AddAmount(resource.Value);
         }
     }
 

@@ -129,4 +129,14 @@ public class Utils : MonoBehaviour
             )) return hit.point;
         return Vector3.zero;
     }
+
+    public static Color LightenColor(Color color, float factor)
+    {
+        return new Color(
+            Mathf.Clamp01(color.r + factor),
+            Mathf.Clamp01(color.g + factor),
+            Mathf.Clamp01(color.b + factor),
+            Mathf.Clamp01(color.a + factor)
+        );
+    }
 }

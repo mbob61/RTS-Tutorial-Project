@@ -15,12 +15,21 @@ public class Globals {
     public static BuildingData[] AVAILABLE_BUILDINGS_DATA;
     public static List<UnitManager> CURRENTLY_SELECTED_UNITS = new List<UnitManager>();
 
-    public static Dictionary<InGameResource, GameResource> AVAILABLE_RESOURCES = new Dictionary<InGameResource, GameResource>()
+    public static Dictionary<InGameResource, GameResource>[] AVAILABLE_RESOURCES;
+
+    public static void InitializeGameResources(int playerCount)
     {
-        { InGameResource.Gold, new GameResource("Gold", 250) },
-        { InGameResource.Wood, new GameResource("Wood", 250) },
-        { InGameResource.Stone, new GameResource("Stone", 250) }
-    };
+        AVAILABLE_RESOURCES = new Dictionary<InGameResource, GameResource>[playerCount];
+        for (int i = 0; i < playerCount; i++)
+        {
+            AVAILABLE_RESOURCES[i] = new Dictionary<InGameResource, GameResource>()
+            {
+                { InGameResource.Gold, new GameResource("Gold", 1000) },
+                { InGameResource.Wood, new GameResource("Wood", 1000) },
+                { InGameResource.Stone, new GameResource("Stone", 1000) }
+            };
+        }
+    }
 
     public static Dictionary<InGameResource, int> XP_CONVERSION_TO_RESOURCE = new Dictionary<InGameResource, int>()
     {
@@ -67,12 +76,17 @@ public class Globals {
             .ToList();
     }
 
-    // Check if we have the resources to pay for a cost
     public static bool CanBuy(List<ResourceValue> cost)
+    {
+        return CanBuy(GameManager.instance.gamePlayerParameters.myPlayerId, cost);
+    }
+
+    // Check if we have the resources to pay for a cost
+    public static bool CanBuy(int playerID, List<ResourceValue> cost)
     {
         foreach(ResourceValue resource in cost)
         {
-            if (AVAILABLE_RESOURCES[resource.code].CurrentAmount < resource.amount)
+            if (AVAILABLE_RESOURCES[playerID][resource.code].CurrentAmount < resource.amount)
             {
                 return false;
             }

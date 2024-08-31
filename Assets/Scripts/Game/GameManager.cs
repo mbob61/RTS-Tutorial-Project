@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -20,7 +21,31 @@ public class GameManager : MonoBehaviour
 
     public float resourceProductionRate = 1f;
 
-    private void Awake()
+#if UNITY_EDITOR
+
+    private void OnGUI()
+    {
+        GUILayout.BeginArea(new Rect(0f, 40f, 100f, 100f));
+
+        int newMyPlayerId = GUILayout.SelectionGrid(
+            gamePlayerParameters.myPlayerId,
+            gamePlayerParameters.players.Select((p, i) => i.ToString()).ToArray(),
+            gamePlayerParameters.players.Length
+        );
+
+        GUILayout.EndArea();
+
+
+        if (newMyPlayerId != gamePlayerParameters.myPlayerId)
+        {
+            gamePlayerParameters.myPlayerId = newMyPlayerId;
+            EventManager.TriggerEvent("SetPlayer", newMyPlayerId);
+        }
+    }
+#endif
+
+
+        private void Awake()
     {
         DataHandler.LoadGameData();
 
@@ -29,6 +54,8 @@ public class GameManager : MonoBehaviour
         startPosition = Utils.MiddleOfScreenPointToWorld();
 
         gameIsPaused = false;
+
+        Globals.InitializeGameResources(gamePlayerParameters.players.Length);
     }
 
     public void Start()

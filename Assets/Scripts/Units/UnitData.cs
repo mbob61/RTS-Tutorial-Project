@@ -22,9 +22,9 @@ public class UnitData : ScriptableObject
     public float attackRate;
     public float fieldOfViewRange;
 
-    public bool IsAffordable()
+    public bool IsAffordable(int owner)
     {
-        return Globals.CanBuy(costs);
+        return Globals.CanBuy(owner, costs);
     }
 }
 

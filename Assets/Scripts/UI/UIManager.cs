@@ -62,6 +62,10 @@ public class UIManager : MonoBehaviour
 
     private Dictionary<string, GameParameters> gameParameters;
 
+    private int myPlayerID;
+
+    [Header("Misc")]
+    public Image playerIndicatorImage;
 
     private void Awake()
     {
@@ -89,21 +93,7 @@ public class UIManager : MonoBehaviour
             AddBuildingButtonListener(buttonObject, i);
 
             buildingButtons[code] = buttonObject;
-            if (!Globals.AVAILABLE_BUILDINGS_DATA[i].IsAffordable())
-            {
-                buttonObject.interactable = false;
-            }
             button.GetComponent<BuildingButton>().Initialize(Globals.AVAILABLE_BUILDINGS_DATA[i]);
-        }
-
-        // Resource information top bar
-        resourceTextFields = new Dictionary<InGameResource, TextMeshProUGUI>();
-        foreach (KeyValuePair<InGameResource, GameResource> pair in Globals.AVAILABLE_RESOURCES)
-        {
-            GameObject resourceDisplayObject = Instantiate(resourceDisplayPrefab, resourceParent);
-            resourceDisplayPrefab.name = pair.Key.ToString();
-            resourceTextFields[pair.Key] = resourceDisplayObject.transform.Find("Amount").GetComponent<TextMeshProUGUI>();
-            SetResourcesText(pair.Key, pair.Value.CurrentAmount);
         }
 
         // hide all selection group buttons
@@ -127,9 +117,32 @@ public class UIManager : MonoBehaviour
 
     }
 
+    private void Start()
+    {
+        myPlayerID = GameManager.instance.gamePlayerParameters.myPlayerId;
+
+        // set player indicator color to match my player color
+        Color c = GameManager.instance.gamePlayerParameters.players[myPlayerID].color;
+        c = Utils.LightenColor(c, 0.2f);
+        playerIndicatorImage.color = c;
+
+
+        // Resource information top bar
+        resourceTextFields = new Dictionary<InGameResource, TextMeshProUGUI>();
+        foreach (KeyValuePair<InGameResource, GameResource> pair in Globals.AVAILABLE_RESOURCES[myPlayerID])
+        {
+            GameObject resourceDisplayObject = Instantiate(resourceDisplayPrefab, resourceParent);
+            resourceDisplayPrefab.name = pair.Key.ToString();
+            resourceTextFields[pair.Key] = resourceDisplayObject.transform.Find("Amount").GetComponent<TextMeshProUGUI>();
+            SetResourcesText(pair.Key, pair.Value.CurrentAmount);
+        }
+
+        CheckBuyLimits();
+    }
+
     private void OnEnable()
     {
-        EventManager.AddListener("UpdateResourceTexts", OnUpdateResourcesTexts);
+        EventManager.AddListener("UpdateResourceTexts", OnUpdateResourceTexts);
         EventManager.AddListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
         EventManager.AddListener("HoverBuildingButton", OnHoverBuildingButton);
         EventManager.AddListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
@@ -139,11 +152,14 @@ public class UIManager : MonoBehaviour
         EventManager.AddListener("UpdatePlacedBuildingProduction", OnUpdatePlacedBuildingProduction);
         EventManager.AddListener("PlaceBuildingOn", OnPlaceBuildingOn);
         EventManager.AddListener("PlaceBuildingOff", OnPlaceBuildingOff);
+
+        EventManager.AddListener("SetPlayer", _OnSetPlayer);
+
     }
 
     private void OnDisable()
     {
-        EventManager.RemoveListener("UpdateResourceTexts", OnUpdateResourcesTexts);
+        EventManager.RemoveListener("UpdateResourceTexts", OnUpdateResourceTexts);
         EventManager.RemoveListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
         EventManager.RemoveListener("HoverBuildingButton", OnHoverBuildingButton);
         EventManager.RemoveListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
@@ -153,6 +169,9 @@ public class UIManager : MonoBehaviour
         EventManager.RemoveListener("UpdatePlacedBuildingProduction", OnUpdatePlacedBuildingProduction);
         EventManager.RemoveListener("PlaceBuildingOn", OnPlaceBuildingOn);
         EventManager.RemoveListener("PlaceBuildingOff", OnPlaceBuildingOff);
+
+        EventManager.RemoveListener("SetPlayer", _OnSetPlayer);
+
     }
 
     private void OnUpdatePlacedBuildingProduction(object data)
@@ -205,10 +224,9 @@ public class UIManager : MonoBehaviour
         resourceTextFields[resource].text = resource.ToString() + ": " + value.ToString();
     }
 
-    public void OnUpdateResourcesTexts()
+    public void OnUpdateResourceTexts()
     {
-        foreach(KeyValuePair<InGameResource, GameResource> pair in Globals.AVAILABLE_RESOURCES)
-        {
+        foreach(KeyValuePair<InGameResource, GameResource> pair in Globals.AVAILABLE_RESOURCES[myPlayerID]) {
             SetResourcesText(pair.Key, pair.Value.CurrentAmount);
         }
 
@@ -219,7 +237,7 @@ public class UIManager : MonoBehaviour
     {
         foreach (UnitData data in Globals.AVAILABLE_BUILDINGS_DATA)
         {
-            buildingButtons[data.code].interactable = data.IsAffordable();
+            buildingButtons[data.code].interactable = data.IsAffordable(myPlayerID);
         }
     }
 
@@ -359,7 +377,7 @@ public class UIManager : MonoBehaviour
                 t.Find("Icon").GetComponent<Image>().sprite = Resources.Load<Sprite>(
                     $"Textures/GameResources/{resource.code}");
 
-                if (Globals.AVAILABLE_RESOURCES[resource.code].CurrentAmount < resource.amount)
+                if (Globals.AVAILABLE_RESOURCES[myPlayerID][resource.code].CurrentAmount < resource.amount)
                 {
                     t.Find("Amount").GetComponent<TextMeshProUGUI>().color = invalidColor;
                 }
@@ -545,5 +563,16 @@ public class UIManager : MonoBehaviour
             }
         }
 
+    }
+
+    private void _OnSetPlayer(object data)
+    {
+        int playerId = (int)data;
+        myPlayerID = playerId;
+        Color c = GameManager.instance.gamePlayerParameters.players[myPlayerID].color;
+        c = Utils.LightenColor(c, 0.2f);
+        playerIndicatorImage.color = c;
+        OnUpdateResourceTexts();
+        CheckBuyLimits();
     }
 }

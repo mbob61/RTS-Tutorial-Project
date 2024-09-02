@@ -6,7 +6,7 @@ using System.Linq;
 public class GameManager : MonoBehaviour
 {
     public GameGlobalParameters gameGlobalParameters;
-    public GamePlayerParameters gamePlayerParameters;
+    public GamePlayerParameters gamePlayersParameters;
     public GameInputParameters gameInputParameters;
 
     [SerializeField] private LayerMask terrainLayer;
@@ -30,17 +30,17 @@ public class GameManager : MonoBehaviour
         GUILayout.BeginArea(new Rect(0f, 40f, 100f, 100f));
 
         int newMyPlayerId = GUILayout.SelectionGrid(
-            gamePlayerParameters.myPlayerId,
-            gamePlayerParameters.players.Select((p, i) => i.ToString()).ToArray(),
-            gamePlayerParameters.players.Length
+            gamePlayersParameters.myPlayerId,
+            gamePlayersParameters.players.Select((p, i) => i.ToString()).ToArray(),
+            gamePlayersParameters.players.Length
         );
 
         GUILayout.EndArea();
 
 
-        if (newMyPlayerId != gamePlayerParameters.myPlayerId)
+        if (newMyPlayerId != gamePlayersParameters.myPlayerId)
         {
-            gamePlayerParameters.myPlayerId = newMyPlayerId;
+            gamePlayersParameters.myPlayerId = newMyPlayerId;
             EventManager.TriggerEvent("SetPlayer", newMyPlayerId);
         }
     }
@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour
 
         gameIsPaused = false;
 
-        Globals.InitializeGameResources(gamePlayerParameters.players.Length);
+        Globals.InitializeGameResources(gamePlayersParameters.players.Length);
 
         //testScriptableObject.SaveToFile();
         //testScriptableObject.LoadFromFile();
@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
 
         Debug.Log("Woot");
         DataHandler.SaveGameData();

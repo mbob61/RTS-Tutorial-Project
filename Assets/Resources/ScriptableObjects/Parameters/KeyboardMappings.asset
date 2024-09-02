@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be4c0ab30fee4189993b0719033a87d, type: 3}
   m_Name: KeyboardMappings
   m_EditorClassIdentifier: 
+  fieldsToSerialize: []
   fieldsToShowInGame: []
   bindings:
   - displayName: Build a house
@@ -20,3 +21,6 @@ MonoBehaviour:
   - displayName: Build a tower
     key: t
     inputEvent: Build:tower
+  - displayName: Show the Debug Console
+    key: '`'
+    inputEvent: ShowDebugConsole

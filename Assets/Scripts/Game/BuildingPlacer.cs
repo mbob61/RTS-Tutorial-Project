@@ -26,13 +26,13 @@ public class BuildingPlacer : MonoBehaviour
     {
         SpawnBuilding(
             GameManager.instance.gameGlobalParameters.initialBuilding,
-            GameManager.instance.gamePlayerParameters.myPlayerId,
+            GameManager.instance.gamePlayersParameters.myPlayerId,
             GameManager.instance.startPosition
         );
 
         SpawnBuilding(
             GameManager.instance.gameGlobalParameters.initialBuilding,
-            GameManager.instance.gamePlayerParameters.myPlayerId + 1,
+            GameManager.instance.gamePlayersParameters.myPlayerId + 1,
             GameManager.instance.startPosition + new Vector3(-15, 0f, 0f));
     }
 
@@ -82,7 +82,7 @@ public class BuildingPlacer : MonoBehaviour
         }
         Building building = new Building(
             Globals.AVAILABLE_BUILDINGS_DATA[index],
-            GameManager.instance.gamePlayerParameters.myPlayerId);
+            GameManager.instance.gamePlayersParameters.myPlayerId);
 
         buildingToPlace = building;
         lastPlacementPosition = Vector3.zero;

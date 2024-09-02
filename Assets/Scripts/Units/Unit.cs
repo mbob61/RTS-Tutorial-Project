@@ -79,7 +79,7 @@ public class Unit {
         //Remove the "is_trigger" from the collider so the buildings can have collisions
         transform.GetComponent<BoxCollider>().isTrigger = false;
 
-        if (owner == GameManager.instance.gamePlayerParameters.myPlayerId)
+        if (owner == GameManager.instance.gamePlayersParameters.myPlayerId)
         {
             // Update the players resources by deducting the cost of the building
             foreach (ResourceValue value in data.costs)
@@ -151,7 +151,7 @@ public class Unit {
         if (data.producedResources.Length == 0) return null;
 
         GameGlobalParameters globalParameters = GameManager.instance.gameGlobalParameters;
-        GamePlayerParameters playerParameters = GameManager.instance.gamePlayerParameters;
+        GamePlayerParameters playerParameters = GameManager.instance.gamePlayersParameters;
         Vector3 currentPosition = transform.position;
 
 

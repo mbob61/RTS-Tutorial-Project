@@ -9,7 +9,7 @@ public class CheckTargetIsOnMyTeam : Node
 
     public CheckTargetIsOnMyTeam(UnitManager manager) : base()
     {
-        myPlayerId = GameManager.instance.gamePlayerParameters.myPlayerId;
+        myPlayerId = GameManager.instance.gamePlayersParameters.myPlayerId;
     }
 
     public override NodeState Evaluate()

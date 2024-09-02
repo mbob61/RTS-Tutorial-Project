@@ -119,10 +119,10 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        myPlayerID = GameManager.instance.gamePlayerParameters.myPlayerId;
+        myPlayerID = GameManager.instance.gamePlayersParameters.myPlayerId;
 
         // set player indicator color to match my player color
-        Color c = GameManager.instance.gamePlayerParameters.players[myPlayerID].color;
+        Color c = GameManager.instance.gamePlayersParameters.players[myPlayerID].color;
         c = Utils.LightenColor(c, 0.2f);
         playerIndicatorImage.color = c;
 
@@ -409,7 +409,7 @@ public class UIManager : MonoBehaviour
     {
         selectedUnit = unit;
 
-        bool unitIsMine = unit.Owner == GameManager.instance.gamePlayerParameters.myPlayerId;
+        bool unitIsMine = unit.Owner == GameManager.instance.gamePlayersParameters.myPlayerId;
 
         // adapt content panel heights to match info to display
         int contentHeight = unitIsMine ? 60 + unit.Production.Count * 16 : 60;
@@ -541,7 +541,7 @@ public class UIManager : MonoBehaviour
         // chek if level up button is disabled or not
         if (
             selectedUnit != null &&
-            selectedUnit.Owner == GameManager.instance.gamePlayerParameters.myPlayerId &&
+            selectedUnit.Owner == GameManager.instance.gamePlayersParameters.myPlayerId &&
             !selectedUnit.LevelMaxedOut &&
             Globals.CanBuy(selectedUnit.LevelUpData.levelUpCost)
         )
@@ -569,7 +569,7 @@ public class UIManager : MonoBehaviour
     {
         int playerId = (int)data;
         myPlayerID = playerId;
-        Color c = GameManager.instance.gamePlayerParameters.players[myPlayerID].color;
+        Color c = GameManager.instance.gamePlayersParameters.players[myPlayerID].color;
         c = Utils.LightenColor(c, 0.2f);
         playerIndicatorImage.color = c;
         OnUpdateResourceTexts();

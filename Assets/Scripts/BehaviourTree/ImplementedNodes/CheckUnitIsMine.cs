@@ -6,7 +6,7 @@ public class CheckUnitIsMine : Node
 
     public CheckUnitIsMine(UnitManager unit) : base()
     {
-        unitIsMine = unit.Unit.Owner == GameManager.instance.gamePlayerParameters.myPlayerId;
+        unitIsMine = unit.Unit.Owner == GameManager.instance.gamePlayersParameters.myPlayerId;
     }
 
     public override NodeState Evaluate()

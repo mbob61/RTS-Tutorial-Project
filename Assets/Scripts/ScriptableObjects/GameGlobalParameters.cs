@@ -30,6 +30,8 @@ public class GameGlobalParameters : GameParameters
 
     public delegate int ResourceProductionFunction(float distance);
 
+    public bool testingDebugConsole = false;
+
     [HideInInspector]
     public ResourceProductionFunction woodProductionFunction = (float distance) =>
     {

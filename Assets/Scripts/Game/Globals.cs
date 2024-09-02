@@ -78,7 +78,7 @@ public class Globals {
 
     public static bool CanBuy(List<ResourceValue> cost)
     {
-        return CanBuy(GameManager.instance.gamePlayerParameters.myPlayerId, cost);
+        return CanBuy(GameManager.instance.gamePlayersParameters.myPlayerId, cost);
     }
 
     // Check if we have the resources to pay for a cost

@@ -7835,6 +7835,7 @@ MonoBehaviour:
   startPosition: {x: 0, y: 0, z: 0}
   gameIsPaused: 0
   resourceProductionRate: 1
+  testScriptableObject: {fileID: 11400000, guid: e8bebf8d4556148478252015078e3a7f, type: 2}
 --- !u!114 &2124038021
 MonoBehaviour:
   m_ObjectHideFlags: 0

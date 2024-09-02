@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
 
     public float resourceProductionRate = 1f;
 
+    public TestScriptableObject testScriptableObject;
+
 #if UNITY_EDITOR
 
     private void OnGUI()
@@ -45,7 +47,7 @@ public class GameManager : MonoBehaviour
 #endif
 
 
-        private void Awake()
+    private void Awake()
     {
         DataHandler.LoadGameData();
 
@@ -56,6 +58,16 @@ public class GameManager : MonoBehaviour
         gameIsPaused = false;
 
         Globals.InitializeGameResources(gamePlayerParameters.players.Length);
+
+        //testScriptableObject.SaveToFile();
+        //testScriptableObject.LoadFromFile();
+        //Debug.Log(testScriptableObject.myIntField);
+        //Debug.Log(testScriptableObject.aFloat);
+        //Debug.Log(testScriptableObject.bFloat);
+        //Debug.Log(testScriptableObject.myBoolVariable);
+        //Debug.Log(testScriptableObject.myColor);
+        //Debug.Log(testScriptableObject.binding.displayName);
+
     }
 
     public void Start()
@@ -98,9 +110,12 @@ public class GameManager : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-#if !UNITY_EDITOR
+#if UNITY_EDITOR
+
+        Debug.Log("Woot");
         DataHandler.SaveGameData();
 #endif
     }
+
 
 }

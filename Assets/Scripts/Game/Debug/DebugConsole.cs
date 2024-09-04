@@ -61,7 +61,23 @@ public class DebugConsole : MonoBehaviour
             Globals.AVAILABLE_RESOURCES[GameManager.instance.gamePlayersParameters.myPlayerId][InGameResource.Gold].AddAmount(x);
             EventManager.TriggerEvent("UpdateResourceTexts");
         });
-        _displayType = DisplayType.History;
+
+        new DebugCommand<string, int>("instantiate_characters",
+            "Instantiates multiple instances of a character unit(by reference code), using a Poisson disc sampling for random positioning.",
+            "instantiate_characters <code> <amount>", (code, amount) =>
+        {
+               CharacterData d = Globals.CHARACTER_DATA[code];
+               int owner = GameManager.instance.gamePlayersParameters.myPlayerId;
+               List<Vector3> positions = Utils.SamplePositions(  amount, 1.5f, Vector2.one * 15, Utils.MiddleOfScreenPointToWorld());
+
+               foreach(Vector3 pos in positions)
+               {
+                   Character c = new Character(d, owner);
+                   c.ComputeProduction();
+                   c.Transform.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(pos);
+               }
+        });
+            _displayType = DisplayType.History;
     }
 
     private void OnEnable()
@@ -131,9 +147,15 @@ public class DebugConsole : MonoBehaviour
                 {
                     _historyCurrentIndex--;
                     if (_historyCurrentIndex < 0)
+                    {
                         _historyCurrentIndex = 0;
+                    }
 
-                    _consoleInput = _browsableHistory[_historyCurrentIndex].message;
+                    if (_browsableHistory.Length > 0)
+                    {
+
+                        _consoleInput = _browsableHistory[_historyCurrentIndex].message;
+                    }
                 }
                 else if (e.keyCode == KeyCode.DownArrow)
                 {
@@ -147,7 +169,10 @@ public class DebugConsole : MonoBehaviour
                     }
                     else
                     {
-                        _consoleInput = browsableHistory[_historyCurrentIndex].message;
+                        if (browsableHistory.Length > 0)
+                        {
+                            _consoleInput = browsableHistory[_historyCurrentIndex].message;
+                        }
                     }
                 }
             }
@@ -253,17 +278,17 @@ public class DebugConsole : MonoBehaviour
                         return;
                     }
                 }
-                //else if (command is DebugCommand<string, int> dcStringInt)
-                //{
-                //    int i;
-                //    if (int.TryParse(inputParts[2], out i))
-                //        dcStringInt.Invoke(inputParts[1], i);
-                //    else
-                //    {
-                //        _LogError($"'{command.Id}' requires a string and an int parameter!");
-                //        return;
-                //    }
-                //}
+                else if (command is DebugCommand<string, int> dcStringInt)
+                {
+                    int i;
+                    if (int.TryParse(inputParts[2], out i))
+                        dcStringInt.Invoke(inputParts[1], i);
+                    else
+                    {
+                        _LogError($"'{command.Id}' requires a string and an int parameter!");
+                        return;
+                    }
+                }
             }
         }
         else

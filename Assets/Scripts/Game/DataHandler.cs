@@ -16,6 +16,11 @@ public class DataHandler : MonoBehaviour
             parameters.LoadFromFile();
         }
 
+        CharacterData[] characterData = Resources.LoadAll<CharacterData>("ScriptableObjects/Units/Character") as CharacterData[];
+        foreach(CharacterData d in characterData)
+        {
+            Globals.CHARACTER_DATA[d.code] = d;
+        }
         //ResourceData resources = Resources.Load<ResourceData>("ScriptableObjects/Resources") as ResourceData;
         //foreach (ResourceValue r in resources.initialResources)
         //{

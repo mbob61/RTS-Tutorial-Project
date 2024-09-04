@@ -12,6 +12,7 @@ public enum InGameResource
 }
 
 public class Globals {
+    public static Dictionary<string, CharacterData> CHARACTER_DATA = new Dictionary<string, CharacterData>();
     public static BuildingData[] AVAILABLE_BUILDINGS_DATA;
     public static List<UnitManager> CURRENTLY_SELECTED_UNITS = new List<UnitManager>();
 

@@ -12,6 +12,8 @@ public class UnitManager : MonoBehaviour
     public virtual Unit Unit { get; set; }
     private bool selected = false;
     public bool IsSelected { get => selected; }
+    private int selectIndex = -1;
+    public int SelectIndex { get => selectIndex; }
 
     public AudioSource contextualSource;
 
@@ -118,6 +120,7 @@ public class UnitManager : MonoBehaviour
         //play sound
         contextualSource.PlayOneShot(Unit.Data.onSelectSound);
         selected = true;
+        selectIndex = Globals.CURRENTLY_SELECTED_UNITS.Count - 1;
     }
 
     public void DeselectUnit()
@@ -133,6 +136,7 @@ public class UnitManager : MonoBehaviour
         EventManager.TriggerEvent("DeselectUnit", Unit);
 
         selected = false;
+        selectIndex = -1;
     }
 
     protected virtual bool IsReadyForSelection()

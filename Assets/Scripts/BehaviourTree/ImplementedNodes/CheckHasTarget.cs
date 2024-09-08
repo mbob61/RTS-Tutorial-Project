@@ -12,10 +12,16 @@ public class CheckHasTarget : Node
             state = NodeState.FAILURE;
             return state;
         }
+        object currentTargetOffset = Parent.GetData("currentTargetOffset");
+        if (currentTargetOffset == null)
+        {
+            state = NodeState.FAILURE;
+            return state;
+        }
 
         // (in case the target object is gone - for example it died
         // and we haven't cleared it from the data yet)
-        if (!((Transform)currentTarget))
+        if (!(Transform)currentTarget)
         {
             Parent.ClearData("currentTarget");
             state = NodeState.FAILURE;

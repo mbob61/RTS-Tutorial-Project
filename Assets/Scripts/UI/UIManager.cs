@@ -60,6 +60,11 @@ public class UIManager : MonoBehaviour
     public Transform gameSettingsMenusParent;
     public Transform gameSettingsContentParent;
 
+    public Transform unitFormationTypesParent;
+    private List<Image> _unitFormationTypeImages;
+    private Color _unitFormationTypeActiveColor = Color.white;
+    private Color _unitFormationTypeInactiveColor = Color.gray;
+
     private Dictionary<string, GameParameters> gameParameters;
 
     private int myPlayerID;
@@ -69,6 +74,7 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
+        _unitFormationTypeImages = new List<Image>();
         buildingPlacer = GetComponent<BuildingPlacer>();
 
         // Info Panel 
@@ -115,6 +121,12 @@ public class UIManager : MonoBehaviour
         gameSettingsPanel.SetActive(false);
         placedBuildingProductionRectTransform.gameObject.SetActive(false);
 
+        _unitFormationTypeImages.Add(unitFormationTypesParent.Find("FormationNone").GetComponent<Image>());
+        _unitFormationTypeImages.Add(unitFormationTypesParent.Find("FormationLine").GetComponent<Image>());
+        _unitFormationTypeImages.Add(unitFormationTypesParent.Find("FormationGrid").GetComponent<Image>());
+        _unitFormationTypeImages.Add(unitFormationTypesParent.Find("FormationCross").GetComponent<Image>());
+
+        _OnUpdateUnitFormationType();
     }
 
     private void Start()
@@ -155,6 +167,8 @@ public class UIManager : MonoBehaviour
 
         EventManager.AddListener("SetPlayer", _OnSetPlayer);
 
+        EventManager.AddListener("UpdateUnitFormationType", _OnUpdateUnitFormationType);
+
     }
 
     private void OnDisable()
@@ -172,7 +186,32 @@ public class UIManager : MonoBehaviour
 
         EventManager.RemoveListener("SetPlayer", _OnSetPlayer);
 
+        EventManager.RemoveListener("UpdateUnitFormationType", _OnUpdateUnitFormationType);
+
     }
+
+    public void SetUnitFormationType(int type)
+    {
+        Globals.UNIT_FORMATION_TYPE = (UnitFormationType)type;
+        _OnUpdateUnitFormationType();
+    }
+
+    private void _OnUpdateUnitFormationType()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            if ((int)Globals.UNIT_FORMATION_TYPE == i)
+            {
+                _unitFormationTypeImages[i].color = _unitFormationTypeActiveColor;
+            }
+            else
+            {
+                _unitFormationTypeImages[i].color = _unitFormationTypeInactiveColor;
+            }
+        }
+    }
+
+
 
     private void OnUpdatePlacedBuildingProduction(object data)
     {

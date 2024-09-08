@@ -30,12 +30,14 @@ public class TaskTrySetDestinationOrTarget : Node
                 UnitManager um = raycastHit.collider.GetComponent<UnitManager>();
                 if (um != null)
                 {
+
+                    // assign the current target transform
+                    Parent.Parent.SetData("currentTarget", raycastHit.transform);
+
                     if (manager.SelectIndex == 0)
                     {
                         List<Vector2> targetOffsets = ComputeFormationTargetOffsets();
                         EventManager.TriggerEvent("TargetFormationOffsets", targetOffsets);
-                        //Parent.Parent.SetData("currentTarget", raycastHit.transform);
-                        //ClearData("destinationPoint");
                     }
                     state = NodeState.SUCCESS;
                     return state;
@@ -69,11 +71,35 @@ public class TaskTrySetDestinationOrTarget : Node
         // leader unit goes to the exact target point
         offsets.Add(Vector2.zero);
         if (nSelectedUnits == 1) // (abort early if no other unit is selected)
+        { 
             return offsets;
+        }
 
-        // next units have offsets computed with a Poisson disc sampling
-        offsets.AddRange(Utils.SampleOffsets(
-            nSelectedUnits - 1, samplingRadius, samplingRange * Vector2.one));
+        // next units have offsets computed with the chosen formation pattern:
+        // - None -> "random" using Poisson disc sampling
+        // - Line
+        // - Grid
+        // - XCross
+        if (Globals.UNIT_FORMATION_TYPE == UnitFormationType.None)
+        {
+            offsets.AddRange(Utils.SampleOffsets(nSelectedUnits - 1, samplingRadius, samplingRange * Vector2.one));
+        }
+        else
+        {
+            Vector3 dir = raycastHit.point - manager.transform.position;
+            if (Globals.UNIT_FORMATION_TYPE == UnitFormationType.Line)
+            {
+                offsets = UnitFormation.GetLineOffsets(nSelectedUnits, samplingRadius, dir);
+            }
+            else if (Globals.UNIT_FORMATION_TYPE == UnitFormationType.Grid)
+            {
+                offsets = UnitFormation.GetGridOffsets(nSelectedUnits, samplingRadius, dir);
+            }
+            else if (Globals.UNIT_FORMATION_TYPE == UnitFormationType.XCross)
+            {
+                offsets = UnitFormation.GetXCrossOffsets(nSelectedUnits, samplingRadius, dir);
+            }
+            }
         return offsets;
     }
 
@@ -84,10 +110,52 @@ public class TaskTrySetDestinationOrTarget : Node
         // leader unit goes to the exact target point
         positions.Add(hitPoint);
         if (nSelectedUnits == 1) // (abort early if no other unit is selected)
+        { 
             return positions;
+        }
 
-        // next units have positions computed with a Poisson disc sampling
-        positions.AddRange(Utils.SamplePositions(nSelectedUnits - 1, samplingRadius, samplingRange * Vector2.one, hitPoint));
+        // next units have positions computed with the chosen formation pattern:
+        // - None -> "random" using Poisson disc sampling
+        // - Line
+        // - Grid
+        // - XCross
+        if (Globals.UNIT_FORMATION_TYPE == UnitFormationType.None)
+        {
+            positions.AddRange(Utils.SamplePositions(nSelectedUnits - 1, samplingRadius, samplingRange * Vector2.one, hitPoint));
+        }
+        else
+        {
+            Vector3 dir = hitPoint - manager.transform.position;
+            if (Globals.UNIT_FORMATION_TYPE == UnitFormationType.Line)
+            {
+                positions = UnitFormation.GetLinePositions(nSelectedUnits, samplingRadius, dir, hitPoint);
+            }
+            else if (Globals.UNIT_FORMATION_TYPE == UnitFormationType.Grid)
+            {
+                positions = UnitFormation.GetGridPositions(nSelectedUnits, samplingRadius, dir, hitPoint);
+            }
+            else if (Globals.UNIT_FORMATION_TYPE == UnitFormationType.XCross)
+            {
+                positions = UnitFormation.GetXCrossPositions(nSelectedUnits, samplingRadius, dir, hitPoint);
+            }
+        }
         return positions;
+    }
+
+    public void SetFormationTargetOffset(List<Vector2> targetOffsets)
+    {
+        int i = manager.SelectIndex;
+        if (i < 0) return; // unit isn't selected anymore
+        ClearData("destinationPoint");
+        Parent.Parent.SetData("currentTargetOffset", targetOffsets[i]);
+    }
+
+    public void SetFormationTargetPosition(List<Vector3> targetPositions)
+    {
+        int i = manager.SelectIndex;
+        if (i < 0) return; // (unit is not selected anymore)
+        ClearData("currentTarget");
+        ClearData("currentTargetOffset");
+        Parent.Parent.SetData("destinationPoint", targetPositions[i]);
     }
 }

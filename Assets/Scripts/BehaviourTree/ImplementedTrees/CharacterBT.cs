@@ -6,7 +6,21 @@ using BehaviourTree;
 [UnityEngine.RequireComponent(typeof(CharacterManager))]
 public class CharacterBT : BTree
 {
-    CharacterManager manager;
+    private CharacterManager manager;
+    private TaskTrySetDestinationOrTarget trySetDestinationOrTargetNode;
+
+
+    private void OnEnable()
+    {
+        EventManager.AddListener("TargetFormationOffsets", OnTargetFormationOffsets);
+        EventManager.AddListener("TargetFormationPositions", OnTargetFormationPositions);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.RemoveListener("TargetFormationOffsets", OnTargetFormationOffsets);
+        EventManager.RemoveListener("TargetFormationPositions", OnTargetFormationPositions);
+    }
 
     private void Awake()
     {
@@ -18,10 +32,12 @@ public class CharacterBT : BTree
         Node _root;
 
         // prepare our subtrees...
+        trySetDestinationOrTargetNode = new TaskTrySetDestinationOrTarget(manager);
         Sequence trySetDestinationOrTargetSequence = new Sequence(new List<Node> {
             new CheckUnitIsMine(manager),
-            new TaskTrySetDestinationOrTarget(manager),
+            trySetDestinationOrTargetNode,
         });
+
 
         Sequence moveToDestinationSequence = new Sequence(new List<Node> {
             new CheckUnitHasDestination(),
@@ -72,5 +88,23 @@ public class CharacterBT : BTree
         });
 
         return _root;
+    }
+
+    private void OnTargetFormationOffsets(object data)
+    {
+        List<UnityEngine.Vector2> targetOffsets = (List<UnityEngine.Vector2>)data;
+        // extract offset for this unit from the list
+        // and use in the BT data
+        trySetDestinationOrTargetNode.SetFormationTargetOffset(targetOffsets);
+
+    }
+
+    private void OnTargetFormationPositions(object data)
+    {
+        List<UnityEngine.Vector3> targetPositions = (List<UnityEngine.Vector3>)data;
+        // extract position for this unit from the list
+        // and use in the BT data
+        trySetDestinationOrTargetNode.SetFormationTargetPosition(targetPositions);
+
     }
 }

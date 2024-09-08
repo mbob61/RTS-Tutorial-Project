@@ -11,7 +11,16 @@ public enum InGameResource
     Stone
 }
 
+public enum UnitFormationType
+{
+    None,
+    Line,
+    Grid,
+    XCross
+}
+
 public class Globals {
+    public static UnitFormationType UNIT_FORMATION_TYPE = UnitFormationType.None;
     public static Dictionary<string, CharacterData> CHARACTER_DATA = new Dictionary<string, CharacterData>();
     public static BuildingData[] AVAILABLE_BUILDINGS_DATA;
     public static List<UnitManager> CURRENTLY_SELECTED_UNITS = new List<UnitManager>();

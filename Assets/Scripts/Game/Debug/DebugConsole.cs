@@ -77,7 +77,17 @@ public class DebugConsole : MonoBehaviour
                    c.Transform.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(pos);
                }
         });
-            _displayType = DisplayType.History;
+
+        new DebugCommand<int>(
+          "set_unit_formation_type",
+          "Sets the unit formation type (by index).",
+          "set_unit_formation_type <formation_index>", (x) =>
+          {
+              Globals.UNIT_FORMATION_TYPE = (UnitFormationType)x;
+              EventManager.TriggerEvent("UpdateUnitFormationType");
+          });
+
+        _displayType = DisplayType.History;
     }
 
     private void OnEnable()

@@ -1601,7 +1601,7 @@ GameObject:
   - component: {fileID: 260986817}
   - component: {fileID: 260986816}
   m_Layer: 5
-  m_Name: BuildingPanel
+  m_Name: SidePanelBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1663,7 +1663,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.38431373}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3759,7 +3759,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -8957,8 +8957,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   invalidColor: {r: 0.8679245, g: 0.05322181, b: 0.05322181, a: 0.9647059}
-  buildingMenuParent: {fileID: 260986815}
-  buildingButtonPrefab: {fileID: 4827554756361329939, guid: ba949c6bf3aa94ed0b0f3b3f10fa6b55, type: 3}
   resourceParent: {fileID: 1428274954}
   resourceDisplayPrefab: {fileID: 8065788569096675292, guid: cdb273b13dae3451b809b97b9e5b1c06, type: 3}
   infoPanelParent: {fileID: 1473146445}

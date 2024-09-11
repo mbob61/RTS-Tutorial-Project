@@ -29,7 +29,7 @@ public class CharacterBT : BTree
 
     protected override Node SetupTree()
     {
-        Node _root;
+        Node root;
 
         // prepare our subtrees...
         trySetDestinationOrTargetNode = new TaskTrySetDestinationOrTarget(manager);
@@ -44,20 +44,44 @@ public class CharacterBT : BTree
             new TaskMoveToDestination(manager),
         });
 
-        Sequence attackSequence = new Sequence(new List<Node> {
-            new Inverter(new List<Node>
-            {
-                new CheckTargetIsOnMyTeam(manager),
-            }),
-            new CheckEnemyInAttackRange(manager),
-            new Timer(
-                manager.Unit.Data.attackRate,
-                new List<Node>()
+        Selector attackOrBuildSelector = new Selector();
+        if (manager.Unit.Data.attackDamage > 0)
+        {
+            Sequence attackSequence = new Sequence(new List<Node> {
+                new Inverter(new List<Node>
                 {
-                    new TaskAttack(manager)
-                }
-            ),
-        });
+                    new CheckTargetIsOnMyTeam(manager),
+                }),
+                new CheckUnitInRange(manager, true),
+                new Timer(
+                    manager.Unit.Data.attackRate,
+                    new List<Node>()
+                    {
+                        new TaskAttack(manager)
+                    }
+                ),
+            });
+
+            attackOrBuildSelector.Attach(attackSequence);
+        }
+
+        CharacterData cd = (CharacterData)manager.Unit.Data;
+        if (cd.buildPower > 0)
+        {
+            Sequence buildSequence = new Sequence(new List<Node> {
+                new CheckTargetIsOnMyTeam(manager),
+                new CheckUnitInRange(manager, false),
+                new Timer(
+                    cd.buildRate,
+                    new List<Node>()
+                    {
+                        new TaskBuild(manager)
+                    }
+                ),
+            });
+            attackOrBuildSelector.Attach(buildSequence);
+        }
+
 
         Sequence moveToTargetSequence = new Sequence(new List<Node> {
             new CheckHasTarget()
@@ -65,7 +89,7 @@ public class CharacterBT : BTree
         if (manager.Unit.Data.attackDamage > 0)
         {
             moveToTargetSequence.Attach(new Selector(new List<Node> {
-                attackSequence,
+                attackOrBuildSelector,
                 new TaskFollow(manager),
             }));
         }
@@ -75,7 +99,7 @@ public class CharacterBT : BTree
         }
 
         // ... then stitch them together under the root
-        _root = new Selector(new List<Node> {
+        root = new Selector(new List<Node> {
             new Parallel(new List<Node> {
                 trySetDestinationOrTargetSequence,
                 new Selector(new List<Node>
@@ -87,12 +111,12 @@ public class CharacterBT : BTree
             new CheckEnemyInFOVRange(manager),
         });
 
-        return _root;
+        return root;
     }
 
     private void OnTargetFormationOffsets(object data)
     {
-        List<UnityEngine.Vector2> targetOffsets = (List<UnityEngine.Vector2>)data;
+        List<UnityEngine.Vector2> targetOffsets = (List<Vector2>)data;
         // extract offset for this unit from the list
         // and use in the BT data
         trySetDestinationOrTargetNode.SetFormationTargetOffset(targetOffsets);
@@ -101,10 +125,18 @@ public class CharacterBT : BTree
 
     private void OnTargetFormationPositions(object data)
     {
-        List<UnityEngine.Vector3> targetPositions = (List<UnityEngine.Vector3>)data;
+        List<UnityEngine.Vector3> targetPositions = (List<Vector3>)data;
         // extract position for this unit from the list
         // and use in the BT data
         trySetDestinationOrTargetNode.SetFormationTargetPosition(targetPositions);
 
+    }
+
+    public void StartBuildingConstruction(Transform buildingTransform)
+    {
+        Debug.Log("am i here");
+        trySetDestinationOrTargetNode.SetFormationTargetOffset(new List<Vector2>() {
+              UnityEngine.Vector2.zero
+                  }, buildingTransform);
     }
 }

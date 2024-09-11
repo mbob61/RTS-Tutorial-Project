@@ -7,7 +7,7 @@ public class UnitManager : MonoBehaviour
 {
     [SerializeField] private GameObject selectionIndicator;
     private Transform canvasTransform;
-    private GameObject healthBar;
+    protected GameObject healthBar;
     protected BoxCollider boxCollider;
     public virtual Unit Unit { get; set; }
     private bool selected = false;
@@ -97,7 +97,7 @@ public class UnitManager : MonoBehaviour
         }
     }
 
-    private void Select()
+    public virtual void Select()
     {
         EventManager.TriggerEvent("SelectUnit", Unit);
 
@@ -180,7 +180,7 @@ public class UnitManager : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void UpdateHealthBar()
+    protected virtual void UpdateHealthBar()
     {
         if (!healthBar) return;
         Transform fill = healthBar.transform.Find("Bar");

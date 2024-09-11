@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 770bcd5c04e0e495dbb3fa09781c8355, type: 3}
+  m_Name: Worker
+  m_EditorClassIdentifier: 
+  code: worker
+  unitName: Worker
+  description: A worker to construct buildings
+  healthpoints: 5
+  unitPrefab: {fileID: 2502313377195916727, guid: 0dfadec3c8cfe402bb8b2b669348e429, type: 3}
+  costs:
+  - code: 1
+    amount: 10
+  - code: 2
+    amount: 10
+  skills:
+  - {fileID: 11400000, guid: efb0362b0dc554a33948c4c5cb67b294, type: 2}
+  - {fileID: 11400000, guid: 6b39ac1fd75a8443a93981d01490d379, type: 2}
+  producedResources: 
+  onSelectSound: {fileID: 8300000, guid: b2ec01e049eaa469a848e7e70578095b, type: 3}
+  attackRange: 1
+  attackDamage: 1
+  attackRate: 1
+  fieldOfViewRange: 19
+  onMoveValidSound: {fileID: 8300000, guid: fc368c3517fcc451787d10385f0b991b, type: 3}
+  onMoveInvalidSound: {fileID: 8300000, guid: 1ff665c23a1564caf9cee11c287679a5, type: 3}
+  buildRange: 2
+  buildPower: 1
+  buildRate: 1.2

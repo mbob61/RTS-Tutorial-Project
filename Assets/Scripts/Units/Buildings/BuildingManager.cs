@@ -50,11 +50,6 @@ public class BuildingManager : UnitManager
         return validPlacement;
     }
 
-    //public bool HasValidPlacement()
-    //{
-    //    return numberOfCollisions == 0;
-    //}
-
     public bool HasValidPlacement()
     {
         if (numberOfCollisions > 0) return false;
@@ -90,4 +85,28 @@ public class BuildingManager : UnitManager
         return building.HasFixedPlacementStatus;
     }
 
+    protected override void UpdateHealthBar()
+    {
+        if (!healthBar) return;
+        Transform fill = healthBar.transform.Find("Bar");
+
+        // if in consutrction: show current construction ratio
+        if (isActiveAndEnabled && !building.IsAlive)
+        {
+            fill.GetComponent<UnityEngine.UI.Image>().fillAmount = building.ConstructionRatio;
+        }
+        // else show health ratio as usual
+        else
+        {
+            fill.GetComponent<UnityEngine.UI.Image>().fillAmount = Unit.CurrentHP / (float)Unit.MaxHP;
+        }
+
+    }
+
+    public bool Build(int buildPower)
+    {
+        building.SetConstructionRatio(building.ConstructionRatio + (buildPower / 10f));
+        UpdateHealthBar();
+        return building.IsAlive;
+    }
 }

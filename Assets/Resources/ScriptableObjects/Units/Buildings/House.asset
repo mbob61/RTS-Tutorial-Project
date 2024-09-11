@@ -25,7 +25,7 @@ MonoBehaviour:
   - code: 2
     amount: 100
   skills:
-  - {fileID: 11400000, guid: 8d820d4b76baf466a809907b9647363f, type: 2}
+  - {fileID: 11400000, guid: 6fd887658c7734c10a9117a1e8f53174, type: 2}
   producedResources: 000000000100000002000000
   onSelectSound: {fileID: 8300000, guid: b2ec01e049eaa469a848e7e70578095b, type: 3}
   attackRange: 10

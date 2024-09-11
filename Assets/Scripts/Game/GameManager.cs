@@ -58,16 +58,6 @@ public class GameManager : MonoBehaviour
         gameIsPaused = false;
 
         Globals.InitializeGameResources(gamePlayersParameters.players.Length);
-
-        //testScriptableObject.SaveToFile();
-        //testScriptableObject.LoadFromFile();
-        //Debug.Log(testScriptableObject.myIntField);
-        //Debug.Log(testScriptableObject.aFloat);
-        //Debug.Log(testScriptableObject.bFloat);
-        //Debug.Log(testScriptableObject.myBoolVariable);
-        //Debug.Log(testScriptableObject.myColor);
-        //Debug.Log(testScriptableObject.binding.displayName);
-
     }
 
     public void Start()

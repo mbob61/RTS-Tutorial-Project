@@ -18,13 +18,12 @@ public class BuildingBT : BTree
         Node root;
 
         root = new Parallel();
-
         if (buildingManager.Unit.Data.attackDamage > 0)
         {
             Sequence attackSequence = new Sequence(
                 new List<Node>
                 {
-                    new CheckEnemyInAttackRange(buildingManager),
+                    new CheckUnitInRange(buildingManager, true),
                     new Timer(buildingManager.Unit.Data.attackRate, new List<Node>
                     {
                         new TaskAttack(buildingManager)

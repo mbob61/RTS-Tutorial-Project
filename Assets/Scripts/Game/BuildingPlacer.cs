@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 
 public class BuildingPlacer : MonoBehaviour
 {
+    public static BuildingPlacer instance;
+    private UnitManager builderManager;
     private Building buildingToPlace = null;
 
     private Ray ray;
@@ -24,6 +26,7 @@ public class BuildingPlacer : MonoBehaviour
 
     private void Start()
     {
+        instance = this;
         SpawnBuilding(
             GameManager.instance.gameGlobalParameters.initialBuilding,
             GameManager.instance.gamePlayersParameters.myPlayerId,
@@ -67,6 +70,11 @@ public class BuildingPlacer : MonoBehaviour
             }
         }
     }
+    public void SelectBuildingToPlace(BuildingData buildingData, UnitManager builder = null)
+    {
+        PrepareBuildingWithIndexForPlacement(buildingData);
+        this.builderManager = builder;
+    }
 
     public void SelectBuildingToPlace(int buildingDataIndex)
     {
@@ -75,15 +83,17 @@ public class BuildingPlacer : MonoBehaviour
 
     private void PrepareBuildingWithIndexForPlacement(int index)
     {
-        //Destroy the previous "phantom" if there is one
+        PrepareBuildingWithIndexForPlacement(Globals.AVAILABLE_BUILDINGS_DATA[index]);
+    }
+
+    private void PrepareBuildingWithIndexForPlacement(BuildingData data)
+    {
+        // destroy the previous "phantom" if there is one
         if (buildingToPlace != null && !buildingToPlace.HasFixedPlacementStatus)
         {
             Destroy(buildingToPlace.Transform.gameObject);
         }
-        Building building = new Building(
-            Globals.AVAILABLE_BUILDINGS_DATA[index],
-            GameManager.instance.gamePlayersParameters.myPlayerId);
-
+        Building building = new Building( data, GameManager.instance.gamePlayersParameters.myPlayerId);
         buildingToPlace = building;
         lastPlacementPosition = Vector3.zero;
         EventManager.TriggerEvent("PlaceBuildingOn");
@@ -101,33 +111,46 @@ public class BuildingPlacer : MonoBehaviour
 
     private void PlaceBuilding(bool canChain = true)
     {
-        // Place the building
-        buildingToPlace.ComputeProduction();
-        buildingToPlace.Place();
 
-        // Do not allow subsquent builds without pressing the button again
-        // If this is desired, comment out the below and uncomment the below block
-        //buildingToPlace = null;
-
-        if (canChain)
+        // if there is a worker assigned to this construction,
+        // warn its behaviour tree and deselect the building
+        if (builderManager != null)
         {
+            //builderManager.Select();
+            builderManager
+                .GetComponent<CharacterBT>()
+                .StartBuildingConstruction(buildingToPlace.Transform);
+            builderManager = null;
 
-            //Allow continous building if we have the resources for it
-            if (buildingToPlace.IsAffordable())
-            {
-                PrepareBuildingWithIndexForPlacement(buildingToPlace.DataIndex);
-            }
-            else
-            {
-                buildingToPlace = null;
-                EventManager.TriggerEvent("PlaceBuildingOff");
-            }
+            buildingToPlace.Place();
+
+            EventManager.TriggerEvent("PlaceBuildingOff");
+            buildingToPlace = null;
         }
-            // Update the resources texts to reflect the purchase
-            EventManager.TriggerEvent("UpdateResourceTexts");
-            // Set the button interactivity based on the update resources
-            EventManager.TriggerEvent("SetBuildingButtonInteractivity");
-        
+        else
+        {
+            // Place the building
+            buildingToPlace.Place();
+
+            // Do not allow subsquent builds without pressing the button again
+            // If this is desired, comment out the below and uncomment the below block
+            //buildingToPlace = null;
+
+            if (canChain)
+            {
+
+                //Allow continous building if we have the resources for it
+                if (buildingToPlace.IsAffordable())
+                {
+                    PrepareBuildingWithIndexForPlacement(buildingToPlace.DataIndex);
+                }
+                else
+                {
+                    buildingToPlace = null;
+                    EventManager.TriggerEvent("PlaceBuildingOff");
+                }
+            }
+        }        
     }
 
     public void SpawnBuilding(BuildingData data, int owner, Vector3 position)
@@ -147,6 +170,7 @@ public class BuildingPlacer : MonoBehaviour
         buildingToPlace.SetPosition(position);
         // link the data into the manager
         PlaceBuilding(false);
+        buildingToPlace.SetConstructionRatio(1);
         // make sure we have no building selected when the player starts
         // to play
         buildingToPlace = previousBuilding;

@@ -10,8 +10,9 @@ public class UIManager : MonoBehaviour
     private BuildingPlacer buildingPlacer;
     [SerializeField] private Color invalidColor;
 
-    [SerializeField] private Transform buildingMenuParent;
-    [SerializeField] private GameObject buildingButtonPrefab;
+    //[SerializeField] private Transform buildingMenuParent;
+    //[SerializeField] private GameObject buildingButtonPrefab;
+    //private Dictionary<string, Button> buildingButtons;
 
     [SerializeField] private Transform resourceParent;
     [SerializeField] private GameObject resourceDisplayPrefab;
@@ -40,7 +41,6 @@ public class UIManager : MonoBehaviour
 
     private Dictionary<InGameResource, TextMeshProUGUI> resourceTextFields;
 
-    private Dictionary<string, Button> buildingButtons;
 
     private TextMeshProUGUI infoPanelTitleText;
     private TextMeshProUGUI infoPanelDescriptionText;
@@ -85,22 +85,22 @@ public class UIManager : MonoBehaviour
 
         ShowInfoPanel(false);
         
-        // Building Purchase Buttons
-        buildingButtons = new Dictionary<string, Button>();
-        for (int i = 0; i < Globals.AVAILABLE_BUILDINGS_DATA.Length; i++)
-        {
-            GameObject button = GameObject.Instantiate(buildingButtonPrefab, buildingMenuParent);
+        //// Building Purchase Buttons
+        //buildingButtons = new Dictionary<string, Button>();
+        //for (int i = 0; i < Globals.AVAILABLE_BUILDINGS_DATA.Length; i++)
+        //{
+        //    GameObject button = GameObject.Instantiate(buildingButtonPrefab, buildingMenuParent);
 
-            string code = Globals.AVAILABLE_BUILDINGS_DATA[i].code;
-            button.name = code;
-            button.transform.Find("Title").GetComponent<TextMeshProUGUI>().text = Globals.AVAILABLE_BUILDINGS_DATA[i].unitName;
+        //    string code = Globals.AVAILABLE_BUILDINGS_DATA[i].code;
+        //    button.name = code;
+        //    button.transform.Find("Title").GetComponent<TextMeshProUGUI>().text = Globals.AVAILABLE_BUILDINGS_DATA[i].unitName;
 
-            Button buttonObject = button.GetComponent<Button>();
-            AddBuildingButtonListener(buttonObject, i);
+        //    Button buttonObject = button.GetComponent<Button>();
+        //    AddBuildingButtonListener(buttonObject, i);
 
-            buildingButtons[code] = buttonObject;
-            button.GetComponent<BuildingButton>().Initialize(Globals.AVAILABLE_BUILDINGS_DATA[i]);
-        }
+        //    buildingButtons[code] = buttonObject;
+        //    button.GetComponent<BuildingButton>().Initialize(Globals.AVAILABLE_BUILDINGS_DATA[i]);
+        //}
 
         // hide all selection group buttons
         for (int i = 1; i <= 9; i++)
@@ -155,9 +155,9 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         EventManager.AddListener("UpdateResourceTexts", OnUpdateResourceTexts);
-        EventManager.AddListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
-        EventManager.AddListener("HoverBuildingButton", OnHoverBuildingButton);
-        EventManager.AddListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
+        //EventManager.AddListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
+        EventManager.AddListener("HoverSkillButton", _OnHoverSkillButton);
+        EventManager.AddListener("UnhoverSkillButton", _OnUnhoverSkillButton);
         EventManager.AddListener("SelectUnit", _OnSelectUnit);
         EventManager.AddListener("DeselectUnit", _OnDeselectUnit);
 
@@ -174,9 +174,9 @@ public class UIManager : MonoBehaviour
     private void OnDisable()
     {
         EventManager.RemoveListener("UpdateResourceTexts", OnUpdateResourceTexts);
-        EventManager.RemoveListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
-        EventManager.RemoveListener("HoverBuildingButton", OnHoverBuildingButton);
-        EventManager.RemoveListener("UnhoverBuildingButton", OnUnhoverBuildingButton);
+        //EventManager.RemoveListener("SetBuildingButtonInteractivity", OnSetBuildingButtonInteractivity);
+        EventManager.RemoveListener("HoverSkillButton", _OnHoverSkillButton);
+        EventManager.RemoveListener("UnhoverSkillButton", _OnUnhoverSkillButton);
         EventManager.RemoveListener("SelectUnit", _OnSelectUnit);
         EventManager.RemoveListener("DeselectUnit", _OnDeselectUnit);
 
@@ -253,10 +253,10 @@ public class UIManager : MonoBehaviour
         placedBuildingProductionRectTransform.gameObject.SetActive(false);
     }
 
-    private void AddBuildingButtonListener(Button button, int globalBuildingIndex)
-    {
-        button.onClick.AddListener(() => buildingPlacer.SelectBuildingToPlace(globalBuildingIndex));
-    }
+    //private void AddBuildingButtonListener(Button button, int globalBuildingIndex)
+    //{
+    //    button.onClick.AddListener(() => buildingPlacer.SelectBuildingToPlace(globalBuildingIndex));
+    //}
 
     private void SetResourcesText(InGameResource resource, int value)
     {
@@ -272,22 +272,23 @@ public class UIManager : MonoBehaviour
         CheckBuyLimits();
     }
 
-    public void OnSetBuildingButtonInteractivity()
+    private void _OnHoverSkillButton(object data)
     {
-        foreach (UnitData data in Globals.AVAILABLE_BUILDINGS_DATA)
+        SkillData s = (SkillData)data;
+        string title = s.skillName;
+        string desc = s.description;
+
+        List<ResourceValue> cost = new List<ResourceValue>();
+        if (s.type == SkillType.INSTANTIATE_CHARACTER ||
+            s.type == SkillType.INSTANTIATE_BUILDING)
         {
-            buildingButtons[data.code].interactable = data.IsAffordable(myPlayerID);
+            cost = s.unitReference.costs;
         }
-    }
-
-    private void OnHoverBuildingButton(object data)
-    {
-
-        SetInfoPanel((UnitData) data);
+        SetInfoPanel(title, desc, cost);
         ShowInfoPanel(true);
     }
 
-    private void OnUnhoverBuildingButton()
+    public void _OnUnhoverSkillButton()
     {
         ShowInfoPanel(false);
     }
@@ -295,10 +296,13 @@ public class UIManager : MonoBehaviour
     private void _OnSelectUnit(object data)
     {
         Unit unit = (Unit)data;
-
         AddSelectedUnitToUIList(unit);
-        SetSelectedUnitMenu(unit);
-        ShowSelectedUnitMenu(true);
+
+        if (unit.IsAlive)
+        {
+            SetSelectedUnitMenu(unit);
+            ShowSelectedUnitMenu(true);
+        }
     }
 
     private void _OnDeselectUnit(object data)
@@ -488,7 +492,9 @@ public class UIManager : MonoBehaviour
 
         // clear skills
         foreach (Transform child in selectedUnitActionButtonsParent)
+        {
             Destroy(child.gameObject);
+        }
         // reinstantiate new ones (if I own the unit)
         if (unitIsMine && unit.SkillManagers.Count > 0)
         {
@@ -501,6 +507,7 @@ public class UIManager : MonoBehaviour
                 unit.SkillManagers[i].SetButton(b);
                 t.Find("Title").GetComponent<TextMeshProUGUI>().text = unit.SkillManagers[i].skill.skillName;
                 AddUnitSkillButtonListener(b, i);
+                g.GetComponent<SkillButton>().Initialize(unit.SkillManagers[i].skill);
             }
         }
 
@@ -577,7 +584,7 @@ public class UIManager : MonoBehaviour
 
     private void CheckBuyLimits()
     {
-        // chek if level up button is disabled or not
+        // check if level up button is disabled or not
         if (
             selectedUnit != null &&
             selectedUnit.Owner == GameManager.instance.gamePlayersParameters.myPlayerId &&

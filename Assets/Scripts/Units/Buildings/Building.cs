@@ -15,6 +15,10 @@ public class Building : Unit
     private List<Material> materials;
     private BuildingManager buildingManager;
 
+    private BuildingBT behaviourTree;
+    private float constructionRatio;
+    private bool isAlive;
+
     public Building(BuildingData data, int owner) : this(data, owner, new List<ResourceValue>() { }) { }
     public Building(BuildingData data, int owner, List<ResourceValue> production) : base(data, owner, production)
     {
@@ -26,6 +30,11 @@ public class Building : Unit
         }
         placementStatus = BuildingPlacementStatus.VALID;
         SetMaterials(placementStatus);
+
+        behaviourTree = transform.GetComponent<BuildingBT>();
+        behaviourTree.enabled = false;
+        constructionRatio = 0f;
+        isAlive = false;
     }
   
     public override void Place()
@@ -36,6 +45,26 @@ public class Building : Unit
 
         // Set Materials
         SetMaterials(placementStatus);
+
+        // change building construction ratio
+        SetConstructionRatio(0);
+    }
+
+    public void SetConstructionRatio(float ratio)
+    {
+        if (isAlive) return;
+        this.constructionRatio = ratio;
+        if (this.constructionRatio >= 1)
+        {
+            SetAlive();
+        }
+    }
+
+    private void SetAlive()
+    {
+        isAlive = true;
+        behaviourTree.enabled = true;
+        ComputeProduction();
     }
 
     public void CheckAndSetPlacementStatus()
@@ -78,6 +107,8 @@ public class Building : Unit
 
     public bool HasFixedPlacementStatus { get => placementStatus == BuildingPlacementStatus.FIXED; }
     public bool HasValidPlacementStatus { get => placementStatus == BuildingPlacementStatus.VALID; }
+    public float ConstructionRatio { get => constructionRatio; }
+    public override bool IsAlive { get => isAlive; }
     public int DataIndex
     {
         get                

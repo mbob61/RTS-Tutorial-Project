@@ -30,7 +30,7 @@ public class TaskTrySetDestinationOrTarget : Node
                 UnitManager um = raycastHit.collider.GetComponent<UnitManager>();
                 if (um != null)
                 {
-
+                    Debug.Log("This building");
                     // assign the current target transform
                     Parent.Parent.SetData("currentTarget", raycastHit.transform);
 
@@ -99,7 +99,7 @@ public class TaskTrySetDestinationOrTarget : Node
             {
                 offsets = UnitFormation.GetXCrossOffsets(nSelectedUnits, samplingRadius, dir);
             }
-            }
+        }
         return offsets;
     }
 
@@ -142,12 +142,15 @@ public class TaskTrySetDestinationOrTarget : Node
         return positions;
     }
 
-    public void SetFormationTargetOffset(List<Vector2> targetOffsets)
+    public void SetFormationTargetOffset(List<Vector2> targetOffsets, Transform targetTransform = null)
     {
         int i = manager.SelectIndex;
-        if (i < 0) return; // unit isn't selected anymore
+        if (i < 0) return; // (unit is not selected anymore)
         ClearData("destinationPoint");
         Parent.Parent.SetData("currentTargetOffset", targetOffsets[i]);
+        if (targetTransform != null)
+            Parent.Parent.SetData("currentTarget", targetTransform);
+    
     }
 
     public void SetFormationTargetPosition(List<Vector3> targetPositions)

@@ -76,9 +76,6 @@ public class Unit {
 
     public virtual void Place()
     {
-        //Remove the "is_trigger" from the collider so the buildings can have collisions
-        transform.GetComponent<BoxCollider>().isTrigger = false;
-
         if (owner == GameManager.instance.gamePlayersParameters.myPlayerId)
         {
             // Update the players resources by deducting the cost of the building
@@ -86,6 +83,8 @@ public class Unit {
             {
                 Globals.AVAILABLE_RESOURCES[owner][value.code].AddAmount(-value.amount);
             }
+            // Update the resources texts to reflect the purchase
+            EventManager.TriggerEvent("UpdateResourceTexts");
 
             EventManager.TriggerEvent("PlaySoundByName", "buildingCompleted");
         }
@@ -233,4 +232,5 @@ public class Unit {
     public float AttackRange { get => attackRange; }
     public bool LevelMaxedOut { get => levelMaxedOut; }
     public UnitLevelUpData LevelUpData { get => levelUpData; }
+    public virtual bool IsAlive { get => true; }
 }

@@ -27,16 +27,22 @@ public class BuildingPlacer : MonoBehaviour
     private void Start()
     {
         instance = this;
-        SpawnBuilding(
-            GameManager.instance.gameGlobalParameters.initialBuilding,
-            GameManager.instance.gamePlayersParameters.myPlayerId,
-            GameManager.instance.startPosition
-        );
 
-        SpawnBuilding(
-            GameManager.instance.gameGlobalParameters.initialBuilding,
-            GameManager.instance.gamePlayersParameters.myPlayerId + 1,
-            GameManager.instance.startPosition + new Vector3(-15, 0f, 0f));
+        Transform spawnpoints = GameObject.Find("SpawnPoints").transform;
+
+        BuildingData initialBuilding = GameManager.instance.gameGlobalParameters.initialBuilding;
+        GamePlayerParameters p = GameManager.instance.gamePlayersParameters;
+        Vector3 position;
+
+        for (int i = 0; i < p.players.Length; i++)
+        {
+            position = spawnpoints.GetChild(i).position;
+            SpawnBuilding(initialBuilding, i, position);
+            if (i == p.myPlayerId)
+            {
+                Camera.main.GetComponent<CameraManager>().SetPosition(position);
+            }
+        }
     }
 
     private void Update()

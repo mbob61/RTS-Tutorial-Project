@@ -17,6 +17,7 @@ public class CameraManager : MonoBehaviour
     [Header("Other References")]
     [SerializeField] private float desiredAltitude = 10f;
     [SerializeField] private LayerMask terrainLayer;
+    private float distance = 100f;
 
     private Camera _camera;
     private RaycastHit raycastHit;
@@ -24,13 +25,14 @@ public class CameraManager : MonoBehaviour
     private Vector3 forwardVector;
 
     private int mouseOnScreenBorder;
-
     private Coroutine mouseOnScreenCoroutine;
 
     [SerializeField] private Transform groundTarget;
 
     public bool allowMouseMovement;
     public bool allowKeyboardMovement;
+
+    public bool autoAdaptAltitude;
 
     private void Awake()
     {
@@ -138,5 +140,11 @@ public class CameraManager : MonoBehaviour
     {
         Vector3 middleOfTheScreen = Utils.MiddleOfScreenPointToWorld();
         groundTarget.position = middleOfTheScreen;
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+        transform.position = position - distance * transform.forward;
+        ComputeMinimapIndicator(false);
     }
 }

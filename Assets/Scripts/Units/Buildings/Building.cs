@@ -16,7 +16,7 @@ public class Building : Unit
     private BuildingManager buildingManager;
 
     private BuildingBT behaviourTree;
-    private float constructionRatio;
+    private int constructionHP;
     private bool isAlive;
 
     private MeshFilter rendererMesh;
@@ -30,7 +30,7 @@ public class Building : Unit
         behaviourTree = transform.GetComponent<BuildingBT>();
         behaviourTree.enabled = false;
 
-        constructionRatio = 0f;
+        constructionHP = 0;
         isAlive = false;
 
         Transform mesh = transform.Find("Mesh");
@@ -57,19 +57,21 @@ public class Building : Unit
         SetMaterials(placementStatus);
 
         // change building construction ratio
-        SetConstructionRatio(0);
+        SetConstructionHP(0);
     }
 
-    public void SetConstructionRatio(float ratio)
+    public void SetConstructionHP(int hp)
     {
         if (isAlive) return;
-        this.constructionRatio = ratio;
+        this.constructionHP = hp;
+
+        float constructionRatio = constructionHP / (float)MaxHP;
 
         int meshIndex = Mathf.Max(0, (int)(constructionMeshes.Length * constructionRatio) - 1);
         Mesh m = constructionMeshes[meshIndex];
         rendererMesh.sharedMesh = m;
 
-        if (this.constructionRatio >= 1)
+        if (constructionRatio >= 1)
         {
             SetAlive();
         }
@@ -122,7 +124,7 @@ public class Building : Unit
 
     public bool HasFixedPlacementStatus { get => placementStatus == BuildingPlacementStatus.FIXED; }
     public bool HasValidPlacementStatus { get => placementStatus == BuildingPlacementStatus.VALID; }
-    public float ConstructionRatio { get => constructionRatio; }
+    public int ConstructionHP { get => constructionHP; }
     public override bool IsAlive { get => isAlive; }
     public int DataIndex
     {

@@ -170,7 +170,7 @@ public class BuildingPlacer : MonoBehaviour
         buildingToPlace.SetPosition(position);
         // link the data into the manager
         PlaceBuilding(false);
-        buildingToPlace.SetConstructionRatio(1);
+        buildingToPlace.SetConstructionHP(buildingToPlace.MaxHP);
         // make sure we have no building selected when the player starts
         // to play
         buildingToPlace = previousBuilding;
@@ -178,16 +178,42 @@ public class BuildingPlacer : MonoBehaviour
 
     private void OnBuildInput(object data)
     {
-        string code = (string)data;
+        //string code = (string)data;
+        //for (int i = 0; i < Globals.AVAILABLE_BUILDINGS_DATA.Length; i++)
+        //{
+        //    if (Globals.AVAILABLE_BUILDINGS_DATA[i].code == code)
+        //    {
+        //        SelectBuildingToPlace(i);
+        //        return;
+        //    }
+        //}
+
+
+        // check to see if there is at least one selected unit
+        // that can build -> we arbitrarily choose the first one
+        if (Globals.CURRENTLY_SELECTED_UNITS.Count == 0) return;
+
+        UnitManager um = null;
+        foreach (UnitManager selected in Globals.CURRENTLY_SELECTED_UNITS)
+        {
+            if (selected is CharacterManager cm && ((CharacterData)cm.Unit.Data).buildPower > 0)
+            {
+                um = cm;
+                break;
+            }
+        }
+        if (um == null) return;
+        builderManager = um;
+
+
+        string buildingCode = (string)data;
         for (int i = 0; i < Globals.AVAILABLE_BUILDINGS_DATA.Length; i++)
         {
-            if (Globals.AVAILABLE_BUILDINGS_DATA[i].code == code)
+            if (Globals.AVAILABLE_BUILDINGS_DATA[i].code == buildingCode)
             {
                 SelectBuildingToPlace(i);
                 return;
             }
         }
-
-        // get building code and select it for placement
     }
 }

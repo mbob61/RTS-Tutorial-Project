@@ -7,7 +7,7 @@ public class UnitManager : MonoBehaviour
 {
     [SerializeField] private GameObject selectionIndicator;
     private Transform canvasTransform;
-    protected GameObject healthBar;
+    protected GameObject healthbar;
     protected BoxCollider boxCollider;
     public virtual Unit Unit { get; set; }
     private bool selected = false;
@@ -104,11 +104,11 @@ public class UnitManager : MonoBehaviour
         Globals.CURRENTLY_SELECTED_UNITS.Add(this);
         selectionIndicator.SetActive(true);
 
-        if (healthBar == null)
+        if (healthbar == null)
         {
-            healthBar = GameObject.Instantiate(Resources.Load("Prefabs/UI/Healthbar")) as GameObject;
-            healthBar.transform.SetParent(canvasTransform);
-            Healthbar h = healthBar.GetComponent<Healthbar>();
+            healthbar = GameObject.Instantiate(Resources.Load("Prefabs/UI/Healthbar")) as GameObject;
+            healthbar.transform.SetParent(canvasTransform);
+            Healthbar h = healthbar.GetComponent<Healthbar>();
             Rect boundingBox = Utils.GetBoundingBoxOnScreen(
                 transform.Find("Mesh").GetComponent<Renderer>().bounds,
                 Camera.main
@@ -131,8 +131,8 @@ public class UnitManager : MonoBehaviour
         Globals.CURRENTLY_SELECTED_UNITS.Remove(this);
         selectionIndicator.SetActive(false);
 
-        Destroy(healthBar);
-        healthBar = null;
+        Destroy(healthbar);
+        healthbar = null;
         EventManager.TriggerEvent("DeselectUnit", Unit);
 
         selected = false;
@@ -182,8 +182,8 @@ public class UnitManager : MonoBehaviour
 
     protected virtual void UpdateHealthBar()
     {
-        if (!healthBar) return;
-        Transform fill = healthBar.transform.Find("Bar");
+        if (!healthbar) return;
+        Transform fill = healthbar.transform.Find("Bar");
         fill.GetComponent<UnityEngine.UI.Image>().fillAmount = Unit.CurrentHP / (float)Unit.MaxHP;
     }
 }

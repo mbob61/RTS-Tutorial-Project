@@ -85,27 +85,41 @@ public class BuildingManager : UnitManager
         return building.HasFixedPlacementStatus;
     }
 
+    //protected override void UpdateHealthBar()
+    //{
+    //    if (!healthbar) return;
+    //    Transform fill = healthbar.transform.Find("Bar");
+
+    //    // if in consutrction: show current construction ratio
+    //    if (isActiveAndEnabled && !building.IsAlive)
+    //    {
+    //        fill.GetComponent<UnityEngine.UI.Image>().fillAmount = building.ConstructionRatio;
+    //    }
+    //    // else show health ratio as usual
+    //    else
+    //    {
+    //        fill.GetComponent<UnityEngine.UI.Image>().fillAmount = Unit.CurrentHP / (float)Unit.MaxHP;
+    //    }
+
+    //}
+
+
     protected override void UpdateHealthBar()
     {
-        if (!healthBar) return;
-        Transform fill = healthBar.transform.Find("Bar");
+        if (!healthbar) return;
+        Transform fill = healthbar.transform.Find("Bar");
 
-        // if in consutrction: show current construction ratio
-        if (isActiveAndEnabled && !building.IsAlive)
-        {
-            fill.GetComponent<UnityEngine.UI.Image>().fillAmount = building.ConstructionRatio;
-        }
-        // else show health ratio as usual
-        else
-        {
-            fill.GetComponent<UnityEngine.UI.Image>().fillAmount = Unit.CurrentHP / (float)Unit.MaxHP;
-        }
-
+        // if in construction: show current construction HP
+        // else, show current health
+        int hp = (isActiveAndEnabled && !building.IsAlive)
+            ? building.ConstructionHP
+            : Unit.MaxHP;
+        fill.GetComponent<UnityEngine.UI.Image>().fillAmount = hp / (float)Unit.MaxHP;
     }
 
     public bool Build(int buildPower)
     {
-        building.SetConstructionRatio(building.ConstructionRatio + (buildPower / 10f));
+        building.SetConstructionHP(building.ConstructionHP + buildPower);
         UpdateHealthBar();
         return building.IsAlive;
     }

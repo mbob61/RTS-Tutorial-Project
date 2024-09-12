@@ -19,22 +19,32 @@ public class Building : Unit
     private float constructionRatio;
     private bool isAlive;
 
+    private MeshFilter rendererMesh;
+    private Mesh[] constructionMeshes;
+
     public Building(BuildingData data, int owner) : this(data, owner, new List<ResourceValue>() { }) { }
     public Building(BuildingData data, int owner, List<ResourceValue> production) : base(data, owner, production)
     {
+
         buildingManager = transform.GetComponent<BuildingManager>();
+        behaviourTree = transform.GetComponent<BuildingBT>();
+        behaviourTree.enabled = false;
+
+        constructionRatio = 0f;
+        isAlive = false;
+
+        Transform mesh = transform.Find("Mesh");
+
         materials = new List<Material>();
-        foreach (Material material in transform.Find("Mesh").GetComponent<Renderer>().materials)
+        foreach (Material material in mesh.GetComponent<Renderer>().materials)
         {
             materials.Add(new Material(material));
         }
-        placementStatus = BuildingPlacementStatus.VALID;
         SetMaterials(placementStatus);
+        placementStatus = BuildingPlacementStatus.VALID;
 
-        behaviourTree = transform.GetComponent<BuildingBT>();
-        behaviourTree.enabled = false;
-        constructionRatio = 0f;
-        isAlive = false;
+        rendererMesh = mesh.GetComponent<MeshFilter>();
+        constructionMeshes = data.constructionMeshes;
     }
   
     public override void Place()
@@ -54,6 +64,11 @@ public class Building : Unit
     {
         if (isAlive) return;
         this.constructionRatio = ratio;
+
+        int meshIndex = Mathf.Max(0, (int)(constructionMeshes.Length * constructionRatio) - 1);
+        Mesh m = constructionMeshes[meshIndex];
+        rendererMesh.sharedMesh = m;
+
         if (this.constructionRatio >= 1)
         {
             SetAlive();

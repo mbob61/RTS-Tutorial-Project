@@ -35,4 +35,4 @@ MonoBehaviour:
   onMoveInvalidSound: {fileID: 8300000, guid: 1ff665c23a1564caf9cee11c287679a5, type: 3}
   buildRange: 2
   buildPower: 1
-  buildRate: 1.2
+  buildRate: 0.5

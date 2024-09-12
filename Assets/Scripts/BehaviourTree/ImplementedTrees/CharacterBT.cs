@@ -134,7 +134,6 @@ public class CharacterBT : BTree
 
     public void StartBuildingConstruction(Transform buildingTransform)
     {
-        Debug.Log("am i here");
         trySetDestinationOrTargetNode.SetFormationTargetOffset(new List<Vector2>() {
               UnityEngine.Vector2.zero
                   }, buildingTransform);

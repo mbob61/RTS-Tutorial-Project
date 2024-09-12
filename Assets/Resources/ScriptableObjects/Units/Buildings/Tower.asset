@@ -33,3 +33,7 @@ MonoBehaviour:
   attackRate: 0
   fieldOfViewRange: 0
   ambientSound: {fileID: 0}
+  constructionMeshes:
+  - {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  - {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  - {fileID: -1277366460620338370, guid: f9854bce800dc4d76a325f939519cd77, type: 3}

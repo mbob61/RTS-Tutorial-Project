@@ -33,3 +33,7 @@ MonoBehaviour:
   attackRate: 0.2
   fieldOfViewRange: 12
   ambientSound: {fileID: 8300000, guid: 453a3dd8a5da348019ebd2f015ebb99f, type: 3}
+  constructionMeshes:
+  - {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  - {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+  - {fileID: -3502818261249399008, guid: 46d2c1d091a644658908fd1b552e05c5, type: 3}

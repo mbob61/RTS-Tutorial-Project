@@ -19,18 +19,40 @@ public class CoreBooter : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        LoadMap("Map1");
+        LoadMenu();
+    }
+
+    public void LoadMenu()
+    {
+        string prevScene = CoreDataHandler.instance.Scene;
+        CoreDataHandler.instance.SetMapData(null);
+        SceneManager.LoadSceneAsync("MainMenu", LoadSceneMode.Additive).completed += (_) =>
+        {
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName("MainMenu"));
+
+            if (prevScene != null)
+            {
+                Scene sc = SceneManager.GetSceneByName(prevScene);
+                if (sc != null && sc.IsValid())
+                    SceneManager.UnloadSceneAsync(sc);
+            }
+        };
     }
 
     public void LoadMap(string mapReference)
     {
-        MapData data = Resources.Load<MapData>($"ScriptableObjects/Maps/{mapReference}");
-        CoreDataHandler.instance.SetMapData(data);
-        string s = data.sceneName;
+        MapData d = Resources.Load<MapData>($"ScriptableObjects/Maps/{mapReference}");
+        CoreDataHandler.instance.SetMapData(d);
+        string s = d.sceneName;
         SceneManager.LoadSceneAsync(s, LoadSceneMode.Additive).completed += (_) =>
         {
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(s));
-            SceneManager.LoadSceneAsync("GameScene", LoadSceneMode.Additive);
+            Scene sc = SceneManager.GetSceneByName("MainMenu");
+            if (sc != null && sc.IsValid())
+                SceneManager.UnloadSceneAsync(sc).completed += (_) =>
+                {
+                    SceneManager.LoadSceneAsync("GameScene", LoadSceneMode.Additive);
+                };
         };
     }
 }

@@ -18,7 +18,10 @@ public class BinarySerializableData
 
     public Dictionary<string, object> properties;
 
-    public BinarySerializableData(ScriptableObject obj, List<string> fieldsToSerialize)
+    public BinarySerializableData(
+        ScriptableObject obj,
+        List<string> fieldsToSerialize,
+        bool serializeAll = false)
     {
         // extract the serializable data into "properties"
         properties = new Dictionary<string, object>();
@@ -26,7 +29,7 @@ public class BinarySerializableData
         Type T = obj.GetType();
         foreach( FieldInfo field in T.GetFields())
         {
-            if (!fieldsToSerialize.Contains(field.Name))
+            if (!serializeAll && !fieldsToSerialize.Contains(field.Name))
             {
                 continue;
             }

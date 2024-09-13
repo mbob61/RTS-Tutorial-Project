@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 public class MainMenuManager : MonoBehaviour
 {
     [Header("Prefabs")]
@@ -172,5 +173,21 @@ public class MainMenuManager : MonoBehaviour
         });
     }
 
+    public void StartNewGame()
+    {
+        CoreDataHandler.instance.SetGameUID(selectedMap);
+
+        // save player parameters for this map
+        // from the menu setup
+        GamePlayerParameters p = new GamePlayerParameters();
+        p.players = playersData
+            .Where((KeyValuePair<int, PlayerData> p) => activePlayers[p.Key])
+            .Select((KeyValuePair<int, PlayerData> p) => p.Value)
+            .ToArray();
+        p.myPlayerId = 0;
+        p.SaveToFile($"Games/{CoreDataHandler.instance.GameUID}/PlayerParameters", true);
+
+        CoreBooter.instance.LoadMap(selectedMap.sceneName);
+    }
     #endregion
 }
